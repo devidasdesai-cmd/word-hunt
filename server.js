@@ -185,9 +185,15 @@ io.on('connection', (socket) => {
     const players = Object.values(game.players);
     const hasRedSpy = players.some(p => p.team === 'red' && p.role === 'spymaster');
     const hasBlueSpy = players.some(p => p.team === 'blue' && p.role === 'spymaster');
+    const hasRedOp  = players.some(p => p.team === 'red' && p.role === 'operative');
+    const hasBlueOp = players.some(p => p.team === 'blue' && p.role === 'operative');
 
-    if (!hasRedSpy || !hasBlueSpy) {
-      socket.emit('error', { message: 'Each team needs a spymaster before starting' });
+    if (!hasRedSpy || !hasRedOp) {
+      socket.emit('error', { message: 'Red team needs at least one spymaster and one operative' });
+      return;
+    }
+    if (!hasBlueSpy || !hasBlueOp) {
+      socket.emit('error', { message: 'Blue team needs at least one spymaster and one operative' });
       return;
     }
 
@@ -303,9 +309,13 @@ io.on('connection', (socket) => {
   });
 
   socket.on('disconnect', () => {
-    if (currentRoom && games[currentRoom] && currentPlayerId) {
-      // Keep player in game for reconnect; just mark as disconnected
-    }
+    const game = games[currentRoom];
+    if (!game || !currentPlayerId || !game.players[currentPlayerId]) return;
+
+    const name = game.players[currentPlayerId].name;
+    delete game.players[currentPlayerId];
+    addLog(game, `${name} left the game`);
+    broadcastState(game);
   });
 
   function switchTurn(game) {
