@@ -318,6 +318,10 @@ io.on('connection', (socket) => {
     const game = games[currentRoom];
     if (!game || !currentPlayerId || !game.players[currentPlayerId]) return;
 
+    // If the player reconnected on a newer socket, their stored socketId will
+    // have been updated. Don't evict them — only the old socket is gone.
+    if (game.players[currentPlayerId].socketId !== socket.id) return;
+
     const name = game.players[currentPlayerId].name;
     delete game.players[currentPlayerId];
     addLog(game, `${name} left the game`);

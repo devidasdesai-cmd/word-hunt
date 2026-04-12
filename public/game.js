@@ -3,7 +3,7 @@ const socket = io();
 // Parse URL params
 const params = new URLSearchParams(window.location.search);
 const roomCode = params.get('room');
-const playerId = params.get('pid');
+let playerId = params.get('pid'); // let — may be reassigned if server issues a new id
 
 if (!roomCode || !playerId) {
   window.location.href = '/';
@@ -47,7 +47,11 @@ socket.emit('join-room', {
   name: localStorage.getItem('codenames-name') || 'Player',
 });
 
-socket.on('room-joined', () => {});
+socket.on('room-joined', ({ playerId: assignedId }) => {
+  // The server may assign a new id if our original was lost during navigation.
+  // Keep the client in sync so "★" and role checks stay correct.
+  if (assignedId && assignedId !== playerId) playerId = assignedId;
+});
 
 socket.on('game-state', (s) => {
   state = s;
