@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Codenames</title>
+  <title>Word Rush</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
   <style>
@@ -158,7 +158,7 @@
 <body>
   <div class="lobby">
     <div class="logo">
-      <h1>Codenames</h1>
+      <h1>Word Rush</h1>
       <p>Online Multiplayer</p>
     </div>
 
@@ -196,11 +196,11 @@
     if (inviteCode) roomInput.value = inviteCode.toUpperCase();
 
     // Restore saved name
-    const savedName = localStorage.getItem('codenames-name');
+    const savedName = localStorage.getItem('wordrush-name');
     if (savedName) nameInput.value = savedName;
 
     nameInput.addEventListener('input', () => {
-      localStorage.setItem('codenames-name', nameInput.value);
+      localStorage.setItem('wordrush-name', nameInput.value);
     });
 
     roomInput.addEventListener('input', () => {
@@ -220,7 +220,7 @@
     });
 
     socket.on('room-joined', ({ roomCode, playerId }) => {
-      localStorage.setItem('codenames-player-id', playerId);
+      localStorage.setItem('wordrush-player-id', playerId);
       window.location.href = `/game.html?room=${roomCode}&pid=${playerId}`;
     });
 

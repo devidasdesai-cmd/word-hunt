@@ -44,7 +44,7 @@ document.getElementById('copy-link-btn').addEventListener('click', () => {
 socket.emit('join-room', {
   roomCode,
   playerId,
-  name: localStorage.getItem('codenames-name') || 'Player',
+  name: localStorage.getItem('wordrush-name') || 'Player',
 });
 
 socket.on('room-joined', ({ playerId: assignedId }) => {

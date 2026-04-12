@@ -1,7 +1,7 @@
 {
-  "name": "codenames",
+  "name": "word-rush",
   "version": "1.0.0",
-  "description": "Online Codenames game",
+  "description": "Online Word Rush game",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
