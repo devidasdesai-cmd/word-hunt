@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Codenames</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/game.css" />
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="header-left">
+      <span class="logo-sm">Codenames</span>
+      <span class="room-code-badge" id="room-badge">
+        Room: <strong id="room-code-display">—</strong>
+        <button class="copy-btn" id="copy-link-btn" title="Copy invite link">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
+        </button>
+      </span>
+    </div>
+    <div class="score-bar">
+      <div class="score red-score">
+        <span class="score-label">Red</span>
+        <span class="score-num" id="red-remaining">—</span>
+      </div>
+      <div class="turn-indicator" id="turn-indicator">
+        <div class="turn-dot" id="turn-dot"></div>
+        <span id="turn-text">—</span>
+      </div>
+      <div class="score blue-score">
+        <span class="score-num" id="blue-remaining">—</span>
+        <span class="score-label">Blue</span>
+      </div>
+    </div>
+    <div class="header-right" id="header-right"></div>
+  </header>
+
+  <!-- Main layout -->
+  <main class="main">
+    <!-- Left panel: team roster -->
+    <aside class="panel panel-left" id="panel-left">
+      <div class="team-panel red-team">
+        <div class="team-header">
+          <span class="team-dot red"></span> Red Team
+        </div>
+        <div class="player-list" id="red-players"></div>
+      </div>
+      <div class="team-panel blue-team">
+        <div class="team-header">
+          <span class="team-dot blue"></span> Blue Team
+        </div>
+        <div class="player-list" id="blue-players"></div>
+      </div>
+      <div class="team-panel spectator-team" id="spectators-section" style="display:none;">
+        <div class="team-header">
+          <span class="team-dot"></span> Lobby
+        </div>
+        <div class="player-list" id="spec-players"></div>
+      </div>
+    </aside>
+
+    <!-- Center: board + action area -->
+    <div class="center">
+      <!-- Mobile-only players strip -->
+      <div class="mobile-players" id="mobile-players"></div>
+
+      <!-- Action bar (lobby controls, clue form, guessing controls) -->
+      <div class="action-bar" id="action-bar"></div>
+
+      <!-- Board -->
+      <div class="board" id="board"></div>
+
+      <!-- Log -->
+      <div class="log-panel">
+        <div class="log-inner" id="log"></div>
+      </div>
+    </div>
+  </main>
+
+  <!-- Winner overlay -->
+  <div class="overlay" id="winner-overlay" style="display:none;">
+    <div class="overlay-card">
+      <div class="winner-icon" id="winner-icon"></div>
+      <h2 id="winner-title"></h2>
+      <p id="winner-sub"></p>
+      <button class="btn btn-outline" id="new-game-btn">New Game</button>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/game.js"></script>
+</body>
+</html>

@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Codenames</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --red: #c0392b;
+      --red-light: #e74c3c;
+      --blue: #1a5276;
+      --blue-light: #2980b9;
+      --bg: #0f1117;
+      --surface: #1a1d2e;
+      --surface2: #252840;
+      --border: rgba(255,255,255,0.08);
+      --text: #e8eaf0;
+      --text-muted: #7a7f9a;
+      --gold: #f0c040;
+    }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .lobby {
+      width: 100%;
+      max-width: 420px;
+      padding: 2rem;
+    }
+
+    .logo {
+      text-align: center;
+      margin-bottom: 3rem;
+    }
+
+    .logo h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 3rem;
+      letter-spacing: 0.05em;
+      background: linear-gradient(135deg, #e74c3c, #c0392b 40%, #2980b9, #1a5276);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .logo p {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      margin-top: 0.5rem;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+    }
+
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 2rem;
+      margin-bottom: 1rem;
+    }
+
+    .card h2 {
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.15em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+    }
+
+    input[type="text"] {
+      width: 100%;
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      padding: 0.75rem 1rem;
+      outline: none;
+      transition: border-color 0.2s;
+      margin-bottom: 0.75rem;
+    }
+
+    input[type="text"]:focus {
+      border-color: rgba(255,255,255,0.25);
+    }
+
+    input[type="text"]::placeholder { color: var(--text-muted); }
+
+    .btn {
+      width: 100%;
+      padding: 0.8rem 1.5rem;
+      border: none;
+      border-radius: 10px;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.03em;
+    }
+
+    .btn-primary {
+      background: linear-gradient(135deg, #e74c3c, #c0392b);
+      color: white;
+    }
+
+    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+
+    .btn-secondary {
+      background: var(--surface2);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .btn-secondary:hover { border-color: rgba(255,255,255,0.2); }
+
+    .divider {
+      text-align: center;
+      color: var(--text-muted);
+      font-size: 0.8rem;
+      margin: 1rem 0;
+      position: relative;
+    }
+
+    .divider::before, .divider::after {
+      content: '';
+      position: absolute;
+      top: 50%;
+      width: 40%;
+      height: 1px;
+      background: var(--border);
+    }
+
+    .divider::before { left: 0; }
+    .divider::after { right: 0; }
+
+    .error-msg {
+      color: #e74c3c;
+      font-size: 0.8rem;
+      margin-top: 0.5rem;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <div class="lobby">
+    <div class="logo">
+      <h1>Codenames</h1>
+      <p>Online Multiplayer</p>
+    </div>
+
+    <div class="card">
+      <h2>Your Name</h2>
+      <input type="text" id="player-name" placeholder="Enter your name" maxlength="20" />
+    </div>
+
+    <div class="card">
+      <h2>Create Game</h2>
+      <button class="btn btn-primary" id="create-btn">Create New Room</button>
+    </div>
+
+    <div class="divider">or</div>
+
+    <div class="card">
+      <h2>Join Game</h2>
+      <input type="text" id="room-code" placeholder="Enter room code" maxlength="5"
+        style="text-transform: uppercase; letter-spacing: 0.2em; font-weight: 600;" />
+      <button class="btn btn-secondary" id="join-btn">Join Room</button>
+      <p class="error-msg" id="join-error"></p>
+    </div>
+  </div>
+
+  <script src="/socket.io/socket.io.js"></script>
+  <script>
+    const socket = io();
+
+    const nameInput = document.getElementById('player-name');
+    const roomInput = document.getElementById('room-code');
+    const joinError = document.getElementById('join-error');
+
+    // Auto-fill join code from invite link
+    const inviteCode = new URLSearchParams(window.location.search).get('join');
+    if (inviteCode) roomInput.value = inviteCode.toUpperCase();
+
+    // Restore saved name
+    const savedName = localStorage.getItem('codenames-name');
+    if (savedName) nameInput.value = savedName;
+
+    nameInput.addEventListener('input', () => {
+      localStorage.setItem('codenames-name', nameInput.value);
+    });
+
+    roomInput.addEventListener('input', () => {
+      roomInput.value = roomInput.value.toUpperCase();
+    });
+
+    document.getElementById('create-btn').addEventListener('click', () => {
+      const name = nameInput.value.trim() || 'Player';
+      socket.emit('create-room', { name });
+    });
+
+    document.getElementById('join-btn').addEventListener('click', () => {
+      const name = nameInput.value.trim() || 'Player';
+      const code = roomInput.value.trim().toUpperCase();
+      if (!code) { joinError.textContent = 'Enter a room code'; return; }
+      socket.emit('join-room', { roomCode: code, name });
+    });
+
+    socket.on('room-joined', ({ roomCode, playerId }) => {
+      localStorage.setItem('codenames-player-id', playerId);
+      window.location.href = `/game.html?room=${roomCode}&pid=${playerId}`;
+    });
+
+    socket.on('error', ({ message }) => {
+      joinError.textContent = message;
+    });
+  </script>
+</body>
+</html>
