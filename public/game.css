@@ -116,6 +116,16 @@ body {
   color: var(--text-muted);
 }
 
+.score-pts {
+  font-size: 0.58rem;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+  opacity: 0.6;
+  align-self: flex-end;
+  margin-bottom: 2px;
+}
+
 .score-num {
   font-size: 1.4rem;
   font-weight: 700;
@@ -541,98 +551,133 @@ body {
   text-align: center;
 }
 
-/* ─── Board ───────────────────────────────────────── */
+/* ─── Board — Hexagonal 3-4-5-4-3 layout ─────────── */
 .board {
   flex: 1;
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: 0.45rem;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 5px;
   min-height: 0;
+  /* width of widest row (5 cards × 116px + 4 gaps × 5px) */
+  width: 600px;
+  margin: 0 auto;
 }
 
+/* Hex rows: 3-4-5-4-3 */
+.hex-row {
+  display: flex;
+  gap: 5px;
+  flex-shrink: 0;
+}
+
+/* Offset rows to form hexagonal cluster */
+.hex-row-5 { margin-left: 0; }
+.hex-row-4 { margin-left: 60px; }   /* (116+5)/2 ≈ 60 */
+.hex-row-3 { margin-left: 121px; }  /* 116+5 = 121 */
+
+/* ─── Card — flat-top hexagon ─────────────────────── */
 .card {
-  border-radius: 9px;
-  border: 1px solid var(--border);
+  width: 116px;
+  height: 100px;
+  flex-shrink: 0;
+  /* Flat-top hexagon */
+  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
   background: var(--surface2);
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 0.4rem;
+  padding: 0.25rem 1.6rem;
   cursor: default;
   position: relative;
-  transition: all 0.18s;
+  transition: filter 0.18s, transform 0.18s;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
+  border-radius: 0;
+  border: none;
 }
 
 .card-word {
-  font-size: clamp(0.55rem, 1.15vw, 0.85rem);
+  font-size: 0.72rem;
   font-weight: 700;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.04em;
   text-transform: uppercase;
   color: var(--text);
-  line-height: 1.2;
+  line-height: 1.25;
+  word-break: break-word;
+  hyphens: auto;
 }
 
-/* Spymaster color hints */
-.card.hint-red    { background: rgba(192,57,43,0.12); border-color: rgba(192,57,43,0.28); }
-.card.hint-blue   { background: rgba(41,128,185,0.12); border-color: rgba(41,128,185,0.28); }
-.card.hint-assassin { background: rgba(10,10,20,0.55); border-color: rgba(255,255,255,0.04); }
-.card.hint-neutral  { background: var(--surface2); }
+/* ── Spymaster color hints ─────────────────────────── */
+.card.hint-red     { background: rgba(192,57,43,0.18); }
+.card.hint-blue    { background: rgba(41,128,185,0.18); }
+.card.hint-neutral { background: var(--surface2); }
+.card.hint-abyss   { background: rgba(10,4,30,0.75); }
+.card.hint-treasure { background: rgba(240,192,64,0.14); }
 
-.card.hint-red .card-word      { color: rgba(231,76,60,0.9); }
-.card.hint-blue .card-word     { color: rgba(52,152,219,0.9); }
-.card.hint-assassin .card-word { color: rgba(255,255,255,0.22); }
+.card.hint-red .card-word      { color: rgba(231,76,60,0.92); }
+.card.hint-blue .card-word     { color: rgba(52,152,219,0.92); }
+.card.hint-abyss .card-word    { color: rgba(255,255,255,0.2); }
+.card.hint-treasure .card-word { color: rgba(240,192,64,0.9); }
 
+/* Color dot — positioned at top center (safely inside hex shape) */
 .card .color-dot {
   position: absolute;
-  top: 5px;
-  right: 5px;
+  top: 10px;
+  left: 50%;
+  transform: translateX(-50%);
   width: 6px;
   height: 6px;
   border-radius: 50%;
-  opacity: 0.75;
+  opacity: 0.8;
   flex-shrink: 0;
 }
 
-/* Revealed cards */
+/* ── Revealed cards ───────────────────────────────── */
 .card.revealed { cursor: default !important; }
 
 .card.revealed-red {
   background: linear-gradient(135deg, #7b241c, #c0392b);
-  border-color: transparent;
 }
 .card.revealed-red .card-word { color: rgba(255,255,255,0.9); }
 
 .card.revealed-blue {
   background: linear-gradient(135deg, #154360, #1a6090);
-  border-color: transparent;
 }
 .card.revealed-blue .card-word { color: rgba(255,255,255,0.9); }
 
 .card.revealed-neutral {
   background: #252830;
-  border-color: rgba(255,255,255,0.04);
-  opacity: 0.55;
+  opacity: 0.5;
 }
-.card.revealed-neutral .card-word { color: rgba(255,255,255,0.35); }
+.card.revealed-neutral .card-word { color: rgba(255,255,255,0.3); }
 
-.card.revealed-assassin {
-  background: #0b0b12;
-  border-color: rgba(255,255,255,0.03);
-  opacity: 0.75;
+.card.revealed-abyss {
+  background: #07040f;
+  opacity: 0.7;
 }
-.card.revealed-assassin .card-word { color: rgba(255,255,255,0.2); }
+.card.revealed-abyss .card-word { color: rgba(255,255,255,0.18); }
 
-/* Clickable cards */
+.card.revealed-treasure {
+  background: linear-gradient(135deg, #7d6008, #d4ac0d);
+}
+.card.revealed-treasure .card-word {
+  color: rgba(0,0,0,0.85);
+  font-weight: 800;
+}
+
+/* ── Clickable cards (scouts) ─────────────────────── */
 .card.clickable { cursor: pointer; }
 .card.clickable:hover {
-  transform: translateY(-2px);
-  border-color: rgba(255,255,255,0.22);
-  box-shadow: 0 4px 14px rgba(0,0,0,0.3);
+  filter: brightness(1.25);
+  transform: translateY(-3px);
 }
-.card.clickable:active { transform: scale(0.97); }
+.card.clickable:active {
+  filter: brightness(0.9);
+  transform: scale(0.96);
+}
 
 /* ─── Log ─────────────────────────────────────────── */
 .log-panel {
@@ -867,31 +912,19 @@ body {
     font-size: 0.75rem;
   }
 
-  /* Board: square cards via aspect-ratio */
+  /* Board: scale down hex layout on mobile */
   .board {
     flex: none;
     height: auto;
-    gap: 0.3rem;
-    /* ensure full width */
-    width: 100%;
-  }
-
-  .card {
-    aspect-ratio: 1;
-    border-radius: 7px;
-    padding: 0.25rem;
+    transform-origin: top center;
+    transform: scale(0.62);
+    margin-top: -76px;  /* compensate for scale shrink */
+    margin-bottom: -76px;
+    pointer-events: auto;
   }
 
   .card-word {
-    font-size: clamp(0.5rem, 3.5vw, 0.75rem);
-    letter-spacing: 0.03em;
-  }
-
-  .card .color-dot {
-    width: 5px;
-    height: 5px;
-    top: 4px;
-    right: 4px;
+    font-size: 0.68rem;
   }
 
   /* Log shorter */
@@ -1016,20 +1049,17 @@ body {
 body.peek-mode .card.peekable { cursor: crosshair; }
 
 body.peek-mode .card.peekable:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 0 0 2px #9b59b6, 0 4px 14px rgba(0,0,0,0.3);
-  border-color: #9b59b6;
+  transform: translateY(-3px);
+  filter: brightness(1.1) drop-shadow(0 0 6px #9b59b6);
 }
 
-/* Peek result overlays */
+/* Peek result overlays — use filter since box-shadow is clipped by clip-path */
 .card.peek-safe {
-  box-shadow: 0 0 0 2px #2ecc71;
-  border-color: #2ecc71 !important;
+  filter: drop-shadow(0 0 5px #2ecc71);
 }
 
 .card.peek-danger {
-  box-shadow: 0 0 0 2px #e74c3c;
-  border-color: #e74c3c !important;
+  filter: drop-shadow(0 0 5px #e74c3c);
 }
 
 .peek-overlay {

@@ -21,14 +21,16 @@ function generateRoomCode() {
 }
 
 function createGame(roomCode) {
-  const words = getWords(25);
+  const words = getWords(19);
   const startTeam = Math.random() < 0.5 ? 'red' : 'blue';
 
+  // 6 red, 6 blue, 5 neutral, 1 abyss, 1 treasure = 19
   const colors = [];
-  for (let i = 0; i < 9; i++) colors.push(startTeam);
-  for (let i = 0; i < 8; i++) colors.push(startTeam === 'red' ? 'blue' : 'red');
-  colors.push('assassin');
-  for (let i = 0; i < 7; i++) colors.push('neutral');
+  for (let i = 0; i < 6; i++) colors.push('red');
+  for (let i = 0; i < 6; i++) colors.push('blue');
+  colors.push('abyss');
+  colors.push('treasure');
+  for (let i = 0; i < 5; i++) colors.push('neutral');
   colors.sort(() => Math.random() - 0.5);
 
   const cards = words.map((word, i) => ({
@@ -49,6 +51,9 @@ function createGame(roomCode) {
     guessesLeft: 0,
     winner: null,
     log: [],
+    scores: { red: 0, blue: 0 },
+    treasureTeam: null,
+    roundCorrect: 0,
     powerups: {
       red:  { peek: 1, shield: 1, shieldActive: false },
       blue: { peek: 1, shield: 1, shieldActive: false },
@@ -72,6 +77,8 @@ function getPublicState(game, playerId) {
     guessesLeft: game.guessesLeft,
     winner: game.winner,
     log: game.log,
+    scores: game.scores,
+    treasureTeam: game.treasureTeam,
     powerups: game.powerups,
     rapidMode: game.rapidMode,
     timerEnd: game.timerEnd,
@@ -129,8 +136,9 @@ function startRapidTimer(game) {
 // ─── Turn switching (module-scope so timer can call it) ───
 function switchTurn(game) {
   clearGameTimer(game);
-  // Reset shield for the team that just played
+  // Reset shield and round counter for the team that just played
   game.powerups[game.currentTeam].shieldActive = false;
+  game.roundCorrect = 0;
   game.currentTeam = game.currentTeam === 'red' ? 'blue' : 'red';
   game.phase = 'captain-clue';
   game.clue = null;
@@ -227,7 +235,7 @@ io.on('connection', (socket) => {
     }
 
     game.phase = 'captain-clue';
-    addLog(game, `Game started! ${game.startTeam === 'red' ? 'Red' : 'Blue'} goes first (${game.startTeam === 'red' ? 9 : 8} words)`);
+    addLog(game, `Game started! ${game.startTeam === 'red' ? 'Red' : 'Blue'} goes first — 6 cards each, score to win!`);
     broadcastState(game);
   });
 
@@ -246,6 +254,7 @@ io.on('connection', (socket) => {
     game.clue = { word: clueWord, count: clueCount };
     game.guessesLeft = clueCount === 0 ? Infinity : clueCount + 1;
     game.phase = 'guessing';
+    game.roundCorrect = 0;
 
     addLog(game, `${player.name} (${game.currentTeam}) gives clue: "${clueWord}" for ${clueCount === 0 ? '∞' : clueCount}`);
 
@@ -266,52 +275,79 @@ io.on('connection', (socket) => {
 
     const isOwnCard = card.color === game.currentTeam;
 
-    // ── Shield check ──────────────────────────────────
+    // ── Shield check (blocks any non-own card) ────────
     if (!isOwnCard && game.powerups[game.currentTeam].shieldActive) {
       game.powerups[game.currentTeam].shield--;
       game.powerups[game.currentTeam].shieldActive = false;
       addLog(game, `Shield activated! "${card.word}" was blocked — guess doesn't count.`);
       broadcastState(game);
-      return; // card stays hidden, turn continues, guesses unchanged
+      return;
     }
 
     // ── Reveal card ───────────────────────────────────
     card.revealed = true;
     addLog(game, `${player.name} guessed "${card.word}" — ${card.color.toUpperCase()}`);
 
-    if (card.color === 'assassin') {
+    // ── Abyss: instant loss for guessing team ─────────
+    if (card.color === 'abyss') {
       game.winner = game.currentTeam === 'red' ? 'blue' : 'red';
       game.phase = 'ended';
       clearGameTimer(game);
-      addLog(game, `Danger word! ${game.winner === 'red' ? 'Red' : 'Blue'} team wins!`);
+      addLog(game, `The Abyss! ${game.winner === 'red' ? 'Red' : 'Blue'} team wins!`);
+      addLog(game, `Final scores — Red: ${game.scores.red} | Blue: ${game.scores.blue}`);
       broadcastState(game);
       return;
     }
 
-    if (countRemaining(game, 'red') === 0) {
-      game.winner = 'red';
-      game.phase = 'ended';
-      clearGameTimer(game);
-      addLog(game, 'Red team wins!');
-      broadcastState(game);
-      return;
-    }
-    if (countRemaining(game, 'blue') === 0) {
-      game.winner = 'blue';
-      game.phase = 'ended';
-      clearGameTimer(game);
-      addLog(game, 'Blue team wins!');
+    // ── Treasure: +1 bonus point, turn ends ───────────
+    if (card.color === 'treasure') {
+      game.scores[game.currentTeam]++;
+      game.treasureTeam = game.currentTeam;
+      addLog(game, `${player.name} found the Treasure! +1 bonus point for ${game.currentTeam === 'red' ? 'Red' : 'Blue'}!`);
+      switchTurn(game);
       broadcastState(game);
       return;
     }
 
+    // ── Own card: score a point ───────────────────────
+    if (isOwnCard) {
+      game.scores[game.currentTeam]++;
+      game.roundCorrect++;
+      if (game.roundCorrect === 3) {
+        game.scores[game.currentTeam]++;
+        addLog(game, `3-in-a-row bonus! +1 extra point for ${game.currentTeam === 'red' ? 'Red' : 'Blue'}!`);
+      }
+    }
+
+    // ── Check natural game end (all team cards revealed) ─
+    if (countRemaining(game, 'red') === 0 || countRemaining(game, 'blue') === 0) {
+      const { red, blue } = game.scores;
+      let winner;
+      if (red > blue) winner = 'red';
+      else if (blue > red) winner = 'blue';
+      else winner = game.treasureTeam || 'tie';
+
+      game.winner = winner;
+      game.phase = 'ended';
+      clearGameTimer(game);
+      if (winner === 'tie') {
+        addLog(game, `Game over — It's a tie! (${red} pts each)`);
+      } else {
+        addLog(game, `${winner === 'red' ? 'Red' : 'Blue'} team wins the game!`);
+      }
+      addLog(game, `Final scores — Red: ${red} | Blue: ${blue}`);
+      broadcastState(game);
+      return;
+    }
+
+    // ── Wrong card (neutral or opponent): switch turn ─
     if (!isOwnCard) {
       switchTurn(game);
       broadcastState(game);
       return;
     }
 
-    // Correct guess
+    // ── Correct own card: decrement guesses ───────────
     game.guessesLeft--;
     if (game.guessesLeft <= 0) switchTurn(game);
     broadcastState(game);

@@ -93,10 +93,9 @@ function render() {
 
   roomCodeDisplay.textContent = state.roomCode;
 
-  const redLeft  = state.cards.filter(c => c.color === 'red'  && !c.revealed).length;
-  const blueLeft = state.cards.filter(c => c.color === 'blue' && !c.revealed).length;
-  redRemaining.textContent  = redLeft;
-  blueRemaining.textContent = blueLeft;
+  const scores = state.scores || { red: 0, blue: 0 };
+  redRemaining.textContent  = scores.red;
+  blueRemaining.textContent = scores.blue;
 
   // Turn indicator
   if (state.phase !== 'lobby' && state.phase !== 'ended') {
@@ -106,7 +105,7 @@ function render() {
     turnText.textContent = `${team} — ${phase}`;
   } else if (state.phase === 'ended') {
     turnDot.className = 'turn-dot';
-    turnText.textContent = 'Game Over';
+    turnText.textContent = state.winner === 'tie' ? 'Draw' : 'Game Over';
   } else {
     turnDot.className = 'turn-dot';
     turnText.textContent = state.rapidMode ? 'Lobby — Rapid Mode' : 'Lobby';
@@ -202,70 +201,88 @@ function renderMobilePlayers() {
 }
 
 // ─── Board ───────────────────────────────────────────
+// 3-4-5-4-3 hexagonal layout (19 cards total)
+const HEX_ROWS = [3, 4, 5, 4, 3];
+
 function renderBoard() {
   board.innerHTML = '';
   const isScoutTurn = state.phase === 'guessing' &&
                       state.myTeam === state.currentTeam &&
                       state.myRole === 'operative';
 
-  state.cards.forEach(card => {
-    const el = document.createElement('div');
-    el.className = 'card';
+  let cardIndex = 0;
+  HEX_ROWS.forEach(size => {
+    const row = document.createElement('div');
+    row.className = `hex-row hex-row-${size}`;
 
-    if (card.revealed) {
-      el.classList.add('revealed', `revealed-${card.color}`);
-    } else {
-      // Captain hints
-      if (card.color) {
-        el.classList.add(`hint-${card.color}`);
-        const dot = document.createElement('div');
-        dot.className = 'color-dot';
-        dot.style.background = dotColor(card.color);
-        el.appendChild(dot);
+    for (let i = 0; i < size; i++) {
+      const card = state.cards[cardIndex++];
+      if (!card) continue;
+
+      const el = document.createElement('div');
+      el.className = 'card';
+
+      if (card.revealed) {
+        el.classList.add('revealed', `revealed-${card.color}`);
+      } else {
+        // Spymaster color hints
+        if (card.color) {
+          el.classList.add(`hint-${card.color}`);
+          const dot = document.createElement('div');
+          dot.className = 'color-dot';
+          dot.style.background = dotColor(card.color);
+          el.appendChild(dot);
+        }
+
+        // Peek result overlay (private to this client)
+        const peek = peekResults[card.id];
+        if (peek) {
+          el.classList.add(`peek-${peek.isSafe ? 'safe' : 'danger'}`);
+          const overlay = document.createElement('div');
+          overlay.className = 'peek-overlay';
+          overlay.textContent = peek.isSafe ? 'SAFE' : peekColorLabel(peek.color);
+          el.appendChild(overlay);
+        }
+
+        if (peekMode && isScoutTurn) {
+          el.classList.add('clickable', 'peekable');
+          el.addEventListener('click', () => {
+            socket.emit('use-peek', { cardId: card.id });
+          });
+        } else if (isScoutTurn && !peekMode) {
+          el.classList.add('clickable');
+          el.addEventListener('click', () => {
+            socket.emit('guess-card', { cardId: card.id });
+          });
+        }
       }
 
-      // Peek result overlay (private to this client)
-      const peek = peekResults[card.id];
-      if (peek) {
-        el.classList.add(`peek-${peek.isSafe ? 'safe' : 'danger'}`);
-        const overlay = document.createElement('div');
-        overlay.className = 'peek-overlay';
-        overlay.textContent = peek.isSafe ? 'SAFE' : peekColorLabel(peek.color);
-        el.appendChild(overlay);
-      }
+      const wordEl = document.createElement('div');
+      wordEl.className = 'card-word';
+      wordEl.textContent = card.word;
+      el.appendChild(wordEl);
 
-      if (peekMode && isScoutTurn) {
-        // In peek mode: clicks peek, not guess
-        el.classList.add('clickable', 'peekable');
-        el.addEventListener('click', () => {
-          socket.emit('use-peek', { cardId: card.id });
-        });
-      } else if (isScoutTurn && !peekMode) {
-        el.classList.add('clickable');
-        el.addEventListener('click', () => {
-          socket.emit('guess-card', { cardId: card.id });
-        });
-      }
+      row.appendChild(el);
     }
 
-    const wordEl = document.createElement('div');
-    wordEl.className = 'card-word';
-    wordEl.textContent = card.word;
-    el.appendChild(wordEl);
-
-    board.appendChild(el);
+    board.appendChild(row);
   });
 }
 
 function dotColor(color) {
-  return color === 'red' ? '#e74c3c' : color === 'blue' ? '#3498db' :
-         color === 'assassin' ? '#555' : '#666';
+  if (color === 'red')      return '#e74c3c';
+  if (color === 'blue')     return '#3498db';
+  if (color === 'abyss')    return '#2c0a3e';
+  if (color === 'treasure') return '#f0c040';
+  return '#555';
 }
 
 function peekColorLabel(color) {
-  return color === 'assassin' ? 'DANGER' :
-         color === 'neutral'  ? 'NEUTRAL' :
-         color === 'red'      ? 'RED' : 'BLUE';
+  if (color === 'abyss')    return 'ABYSS';
+  if (color === 'neutral')  return 'NEUTRAL';
+  if (color === 'treasure') return 'TREASURE';
+  if (color === 'red')      return 'RED';
+  return 'BLUE';
 }
 
 // ─── Action bar ──────────────────────────────────────
@@ -536,13 +553,24 @@ function renderLog() {
 
 // ─── Winner overlay ──────────────────────────────────
 function renderOverlay() {
-  if (state.phase === 'ended' && state.winner) {
+  if (state.phase === 'ended') {
     winnerOverlay.style.display = 'flex';
-    const isRed = state.winner === 'red';
-    winnerIcon.textContent = isRed ? '🔴' : '🔵';
-    winnerTitle.textContent = `${cap(state.winner)} Team Wins!`;
-    winnerTitle.style.color = isRed ? '#e74c3c' : '#3498db';
-    winnerSub.textContent = 'Great game. Ready for another round?';
+    const scores = state.scores || { red: 0, blue: 0 };
+    const scoreStr = `Red: ${scores.red} pts  ·  Blue: ${scores.blue} pts`;
+
+    if (state.winner === 'tie') {
+      winnerIcon.textContent = '🤝';
+      winnerTitle.textContent = "It's a Tie!";
+      winnerTitle.style.color = '#f0c040';
+      winnerSub.textContent = scoreStr;
+    } else {
+      const isRed = state.winner === 'red';
+      winnerIcon.textContent = isRed ? '🔴' : '🔵';
+      winnerTitle.textContent = `${cap(state.winner)} Team Wins!`;
+      winnerTitle.style.color = isRed ? '#e74c3c' : '#3498db';
+      winnerSub.textContent = scoreStr;
+    }
+
     document.getElementById('new-game-btn').onclick = () => {
       socket.emit('new-game');
       winnerOverlay.style.display = 'none';

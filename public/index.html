@@ -10,186 +10,391 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --red: #c0392b;
-      --red-light: #e74c3c;
-      --blue: #1a5276;
-      --blue-light: #2980b9;
+      --red: #e74c3c;
+      --blue: #3498db;
       --bg: #0f1117;
       --surface: #1a1d2e;
       --surface2: #252840;
       --border: rgba(255,255,255,0.08);
+      --border2: rgba(255,255,255,0.14);
       --text: #e8eaf0;
       --text-muted: #7a7f9a;
       --gold: #f0c040;
+    }
+
+    html, body {
+      height: 100%;
     }
 
     body {
       font-family: 'Inter', sans-serif;
       background: var(--bg);
       color: var(--text);
-      min-height: 100vh;
+      min-height: 100%;
       display: flex;
       align-items: center;
       justify-content: center;
+      padding: 1.5rem;
+      /* Subtle radial glow in center */
+      background-image: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(26,29,46,0.9) 0%, transparent 70%);
+      background-color: #0b0d14;
     }
 
-    .lobby {
+    /* ── Page wrapper ── */
+    .page {
       width: 100%;
-      max-width: 420px;
-      padding: 2rem;
+      max-width: 560px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 2.5rem;
     }
 
-    .logo {
+    /* ── Brand ── */
+    .brand {
       text-align: center;
-      margin-bottom: 3rem;
     }
 
-    .logo h1 {
+    .brand h1 {
       font-family: 'Playfair Display', serif;
-      font-size: 3rem;
-      letter-spacing: 0.05em;
-      background: linear-gradient(135deg, #e74c3c, #c0392b 40%, #2980b9, #1a5276);
+      font-size: 3.4rem;
+      letter-spacing: 0.04em;
+      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 35%, #2980b9 65%, #1a5276 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
+      line-height: 1.1;
+      margin-bottom: 0.5rem;
     }
 
-    .logo p {
+    .brand .tagline {
       color: var(--text-muted);
-      font-size: 0.875rem;
-      margin-top: 0.5rem;
-      letter-spacing: 0.1em;
+      font-size: 0.8rem;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
+      font-weight: 500;
     }
 
-    .card {
-      background: var(--surface);
-      border: 1px solid var(--border);
-      border-radius: 16px;
-      padding: 2rem;
-      margin-bottom: 1rem;
-    }
-
-    .card h2 {
-      font-size: 0.75rem;
-      font-weight: 600;
-      letter-spacing: 0.15em;
-      text-transform: uppercase;
-      color: var(--text-muted);
-      margin-bottom: 1.25rem;
-    }
-
-    input[type="text"] {
+    /* ── Name field ── */
+    .name-section {
       width: 100%;
-      background: var(--surface2);
-      border: 1px solid var(--border);
-      border-radius: 10px;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0.55rem;
+    }
+
+    .name-section label {
+      font-size: 0.7rem;
+      font-weight: 600;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      align-self: flex-start;
+      padding-left: 0.1rem;
+    }
+
+    .name-section input {
+      width: 100%;
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
       color: var(--text);
       font-family: 'Inter', sans-serif;
-      font-size: 0.95rem;
-      padding: 0.75rem 1rem;
+      font-size: 1rem;
+      font-weight: 500;
+      padding: 0.85rem 1.1rem;
       outline: none;
-      transition: border-color 0.2s;
-      margin-bottom: 0.75rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+      letter-spacing: 0.02em;
     }
 
-    input[type="text"]:focus {
-      border-color: rgba(255,255,255,0.25);
+    .name-section input:focus {
+      border-color: rgba(255,255,255,0.28);
+      box-shadow: 0 0 0 3px rgba(255,255,255,0.04);
     }
 
-    input[type="text"]::placeholder { color: var(--text-muted); }
+    .name-section input::placeholder { color: var(--text-muted); font-weight: 400; }
 
-    .btn {
+    /* ── Choice cards ── */
+    .choices {
       width: 100%;
-      padding: 0.8rem 1.5rem;
+      display: grid;
+      grid-template-columns: 1fr auto 1fr;
+      gap: 0;
+      align-items: stretch;
+    }
+
+    .choice-card {
+      background: var(--surface);
+      border: 1px solid var(--border2);
+      border-radius: 16px;
+      padding: 1.6rem 1.4rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+      transition: border-color 0.2s, box-shadow 0.2s;
+    }
+
+    .choice-card:hover {
+      border-color: rgba(255,255,255,0.2);
+    }
+
+    /* ── Choice header (icon + title/desc) ── */
+    .choice-header {
+      display: flex;
+      align-items: flex-start;
+      gap: 0.9rem;
+    }
+
+    .choice-icon {
+      width: 40px;
+      height: 40px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+    }
+
+    .choice-create .choice-icon {
+      background: rgba(231,76,60,0.14);
+      color: #e74c3c;
+    }
+
+    .choice-join .choice-icon {
+      background: rgba(52,152,219,0.14);
+      color: #3498db;
+    }
+
+    .choice-header-text h2 {
+      font-size: 0.95rem;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: var(--text);
+      margin-bottom: 0.2rem;
+    }
+
+    .choice-header-text p {
+      font-size: 0.76rem;
+      color: var(--text-muted);
+      line-height: 1.4;
+    }
+
+    /* ── Buttons ── */
+    .btn-choice {
+      width: 100%;
+      padding: 0.75rem 1rem;
       border: none;
       border-radius: 10px;
       font-family: 'Inter', sans-serif;
-      font-size: 0.9rem;
-      font-weight: 600;
+      font-size: 0.88rem;
+      font-weight: 700;
       cursor: pointer;
       transition: all 0.2s;
       letter-spacing: 0.03em;
     }
 
-    .btn-primary {
+    .btn-create {
       background: linear-gradient(135deg, #e74c3c, #c0392b);
-      color: white;
+      color: #fff;
     }
 
-    .btn-primary:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-create:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn-create:active { transform: scale(0.98); }
 
-    .btn-secondary {
+    .btn-join {
+      background: linear-gradient(135deg, #2980b9, #1a5276);
+      color: #fff;
+      flex-shrink: 0;
+      padding: 0.72rem 1.2rem;
+      border-radius: 9px;
+      font-weight: 700;
+      font-size: 0.85rem;
+      font-family: 'Inter', sans-serif;
+      border: none;
+      cursor: pointer;
+      transition: all 0.2s;
+      letter-spacing: 0.03em;
+      width: auto;
+    }
+
+    .btn-join:hover { opacity: 0.88; transform: translateY(-1px); }
+    .btn-join:active { transform: scale(0.98); }
+
+    /* Join row */
+    .join-row {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+    }
+
+    .join-row input {
+      flex: 1;
+      min-width: 0;
       background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 9px;
       color: var(--text);
+      font-family: 'Inter', sans-serif;
+      font-size: 0.95rem;
+      font-weight: 700;
+      padding: 0.72rem 0.85rem;
+      outline: none;
+      text-transform: uppercase;
+      letter-spacing: 0.18em;
+      transition: border-color 0.2s;
+    }
+
+    .join-row input:focus { border-color: rgba(255,255,255,0.28); }
+    .join-row input::placeholder {
+      text-transform: none;
+      font-weight: 400;
+      font-size: 0.82rem;
+      letter-spacing: 0.04em;
+      color: var(--text-muted);
+    }
+
+    /* ── Or divider ── */
+    .or-divider {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0 1rem;
+      flex-shrink: 0;
+    }
+
+    .or-divider span {
+      font-size: 0.72rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.14em;
+      color: var(--text-muted);
+      background: var(--bg);
+      padding: 0.4rem 0.55rem;
+      border-radius: 20px;
       border: 1px solid var(--border);
     }
 
-    .btn-secondary:hover { border-color: rgba(255,255,255,0.2); }
-
-    .divider {
-      text-align: center;
-      color: var(--text-muted);
-      font-size: 0.8rem;
-      margin: 1rem 0;
-      position: relative;
-    }
-
-    .divider::before, .divider::after {
-      content: '';
-      position: absolute;
-      top: 50%;
-      width: 40%;
-      height: 1px;
-      background: var(--border);
-    }
-
-    .divider::before { left: 0; }
-    .divider::after { right: 0; }
-
+    /* ── Error ── */
     .error-msg {
       color: #e74c3c;
-      font-size: 0.8rem;
-      margin-top: 0.5rem;
+      font-size: 0.76rem;
+      min-height: 1rem;
+      font-weight: 500;
+    }
+
+    /* ── Footer hint ── */
+    .footer-hint {
+      font-size: 0.7rem;
+      color: var(--text-muted);
       text-align: center;
+      opacity: 0.55;
+      letter-spacing: 0.06em;
+    }
+
+    /* ── Mobile: stack choices vertically ── */
+    @media (max-width: 520px) {
+      body { padding: 1.2rem 1rem; align-items: flex-start; padding-top: 2.5rem; }
+
+      .page { gap: 2rem; }
+
+      .brand h1 { font-size: 2.6rem; }
+
+      .choices {
+        grid-template-columns: 1fr;
+        gap: 0;
+        display: flex;
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+
+      .or-divider {
+        flex-direction: row;
+        padding: 0.5rem 0;
+      }
+
+      .choice-card { padding: 1.25rem 1.1rem; gap: 1rem; }
+    }
+
+    @media (max-width: 380px) {
+      .brand h1 { font-size: 2.2rem; }
     }
   </style>
 </head>
 <body>
-  <div class="lobby">
-    <div class="logo">
+  <div class="page">
+    <!-- Brand -->
+    <header class="brand">
       <h1>Word Rush</h1>
-      <p>Online Multiplayer</p>
+      <p class="tagline">Real-time multiplayer word strategy</p>
+    </header>
+
+    <!-- Name -->
+    <div class="name-section">
+      <label for="player-name">Your Name</label>
+      <input type="text" id="player-name" placeholder="Enter your name…" maxlength="20" autocomplete="off" />
     </div>
 
-    <div class="card">
-      <h2>Your Name</h2>
-      <input type="text" id="player-name" placeholder="Enter your name" maxlength="20" />
+    <!-- Two choices -->
+    <div class="choices">
+
+      <!-- Create -->
+      <div class="choice-card choice-create">
+        <div class="choice-header">
+          <div class="choice-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <circle cx="12" cy="12" r="10"/>
+              <line x1="12" y1="8" x2="12" y2="16"/>
+              <line x1="8" y1="12" x2="16" y2="12"/>
+            </svg>
+          </div>
+          <div class="choice-header-text">
+            <h2>New Game</h2>
+            <p>Create a room and invite your friends to play</p>
+          </div>
+        </div>
+        <button class="btn-choice btn-create" id="create-btn">Create Room</button>
+      </div>
+
+      <!-- Or divider -->
+      <div class="or-divider"><span>or</span></div>
+
+      <!-- Join -->
+      <div class="choice-card choice-join">
+        <div class="choice-header">
+          <div class="choice-icon">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+              <polyline points="10 17 15 12 10 7"/>
+              <line x1="15" y1="12" x2="3" y2="12"/>
+            </svg>
+          </div>
+          <div class="choice-header-text">
+            <h2>Join Room</h2>
+            <p>Enter a room code to join a friend's game</p>
+          </div>
+        </div>
+        <div class="join-row">
+          <input type="text" id="room-code" placeholder="Room code (e.g. AB3XY)" maxlength="5"
+            autocomplete="off" autocorrect="off" autocapitalize="characters" spellcheck="false" />
+          <button class="btn-join" id="join-btn">Join</button>
+        </div>
+        <p class="error-msg" id="join-error"></p>
+      </div>
+
     </div>
 
-    <div class="card">
-      <h2>Create Game</h2>
-      <button class="btn btn-primary" id="create-btn">Create New Room</button>
-    </div>
-
-    <div class="divider">or</div>
-
-    <div class="card">
-      <h2>Join Game</h2>
-      <input type="text" id="room-code" placeholder="Enter room code" maxlength="5"
-        style="text-transform: uppercase; letter-spacing: 0.2em; font-weight: 600;" />
-      <button class="btn btn-secondary" id="join-btn">Join Room</button>
-      <p class="error-msg" id="join-error"></p>
-    </div>
+    <p class="footer-hint">Share the room code with friends after creating</p>
   </div>
 
   <script src="/socket.io/socket.io.js"></script>
   <script>
     const socket = io();
 
-    const nameInput = document.getElementById('player-name');
-    const roomInput = document.getElementById('room-code');
-    const joinError = document.getElementById('join-error');
+    const nameInput  = document.getElementById('player-name');
+    const roomInput  = document.getElementById('room-code');
+    const joinError  = document.getElementById('join-error');
 
     // Auto-fill join code from invite link
     const inviteCode = new URLSearchParams(window.location.search).get('join');
@@ -205,6 +410,7 @@
 
     roomInput.addEventListener('input', () => {
       roomInput.value = roomInput.value.toUpperCase();
+      joinError.textContent = '';
     });
 
     document.getElementById('create-btn').addEventListener('click', () => {
@@ -212,12 +418,16 @@
       socket.emit('create-room', { name });
     });
 
-    document.getElementById('join-btn').addEventListener('click', () => {
+    document.getElementById('join-btn').addEventListener('click', joinRoom);
+    roomInput.addEventListener('keydown', e => { if (e.key === 'Enter') joinRoom(); });
+    nameInput.addEventListener('keydown', e => { if (e.key === 'Enter') joinRoom(); });
+
+    function joinRoom() {
       const name = nameInput.value.trim() || 'Player';
       const code = roomInput.value.trim().toUpperCase();
-      if (!code) { joinError.textContent = 'Enter a room code'; return; }
+      if (!code) { joinError.textContent = 'Please enter a room code'; return; }
       socket.emit('join-room', { roomCode: code, name });
-    });
+    }
 
     socket.on('room-joined', ({ roomCode, playerId }) => {
       localStorage.setItem('wordrush-player-id', playerId);
@@ -227,6 +437,13 @@
     socket.on('error', ({ message }) => {
       joinError.textContent = message;
     });
+
+    // Auto-focus name if empty, otherwise room code
+    if (!nameInput.value) {
+      nameInput.focus();
+    } else if (inviteCode) {
+      roomInput.focus();
+    }
   </script>
 </body>
 </html>
