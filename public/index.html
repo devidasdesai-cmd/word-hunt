@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Word Rush</title>
+  <title>Word Hunt</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&family=Playfair+Display:wght@700&display=swap" rel="stylesheet" />
   <style>
@@ -253,8 +253,8 @@
   <div class="page">
 
     <header class="brand">
-      <h1>Word Rush</h1>
-      <p class="tagline">Real-time multiplayer word strategy</p>
+      <h1>Word Hunt</h1>
+      <p class="tagline">The real-time treasure hunting word game</p>
     </header>
 
     <div class="panel">
@@ -286,7 +286,7 @@
 
     </div>
 
-    <p class="footer">Share the room code with friends after creating</p>
+    <p class="footer">Share the room code — the more hunters the merrier</p>
 
   </div>
 
@@ -302,11 +302,11 @@
     if (inviteCode) roomInput.value = inviteCode.toUpperCase();
 
     // Restore saved name
-    const savedName = localStorage.getItem('wordrush-name');
+    const savedName = localStorage.getItem('wordhunt-name');
     if (savedName) nameInput.value = savedName;
 
     nameInput.addEventListener('input', () => {
-      localStorage.setItem('wordrush-name', nameInput.value);
+      localStorage.setItem('wordhunt-name', nameInput.value);
     });
 
     roomInput.addEventListener('input', () => {

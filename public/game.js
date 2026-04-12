@@ -43,7 +43,7 @@ document.getElementById('copy-link-btn').addEventListener('click', () => {
 socket.emit('join-room', {
   roomCode,
   playerId,
-  name: localStorage.getItem('wordrush-name') || 'Player',
+  name: localStorage.getItem('wordhunt-name') || localStorage.getItem('wordrush-name') || 'Player',
 });
 
 socket.on('room-joined', ({ playerId: assignedId }) => {
@@ -95,10 +95,10 @@ function renderRoleSelect() {
   roleGrid.innerHTML = '';
 
   const OPTIONS = [
-    { team: 'red',  role: 'spymaster', css: 'role-btn-red-sp',  name: 'Pathfinder', desc: 'Sees all card colors' },
-    { team: 'blue', role: 'spymaster', css: 'role-btn-blue-sp', name: 'Pathfinder', desc: 'Sees all card colors' },
-    { team: 'red',  role: 'operative', css: 'role-btn-red-op',  name: 'Seeker',     desc: 'Guesses the words' },
-    { team: 'blue', role: 'operative', css: 'role-btn-blue-op', name: 'Seeker',     desc: 'Guesses the words' },
+    { team: 'red',  role: 'spymaster', css: 'role-btn-red-sp',  name: 'Pathfinder', desc: 'Holds the treasure map' },
+    { team: 'blue', role: 'spymaster', css: 'role-btn-blue-sp', name: 'Pathfinder', desc: 'Holds the treasure map' },
+    { team: 'red',  role: 'operative', css: 'role-btn-red-op',  name: 'Seeker',     desc: 'Hunts for treasure' },
+    { team: 'blue', role: 'operative', css: 'role-btn-blue-op', name: 'Seeker',     desc: 'Hunts for treasure' },
   ];
 
   OPTIONS.forEach(opt => {
@@ -137,7 +137,7 @@ function render() {
   if (state.phase !== 'lobby' && state.phase !== 'ended') {
     turnDot.className = `turn-dot ${state.currentTeam}`;
     const team  = state.currentTeam === 'red' ? 'Red' : 'Blue';
-    const phase = state.phase === 'captain-clue' ? 'Pathfinder Clue' : 'Guessing';
+    const phase = state.phase === 'captain-clue' ? 'Pathfinder Charts' : 'On the Hunt';
     turnText.textContent = `${team} — ${phase}`;
   } else if (state.phase === 'ended') {
     turnDot.className = 'turn-dot';
@@ -350,7 +350,7 @@ function renderActionBar() {
       const msg = document.createElement('div');
       msg.className = 'waiting-msg';
       const team = state.currentTeam === 'red' ? 'Red' : 'Blue';
-      msg.textContent = `Waiting for ${team} Pathfinder to give a clue…`;
+      msg.textContent = `Waiting for the ${team} Pathfinder to chart the course…`;
       actionBar.appendChild(msg);
     }
   } else if (state.phase === 'guessing') {
@@ -530,14 +530,14 @@ function renderGuessingBar() {
     // End turn button
     const endBtn = document.createElement('button');
     endBtn.className = 'end-turn-btn';
-    endBtn.textContent = 'End Turn';
+    endBtn.textContent = 'Take a Nap';
     endBtn.addEventListener('click', () => socket.emit('end-turn'));
     bar.appendChild(endBtn);
   } else {
     const waitMsg = document.createElement('span');
     waitMsg.className = 'waiting-msg';
     const team = state.currentTeam === 'red' ? 'Red' : 'Blue';
-    waitMsg.textContent = `${team} team is guessing…`;
+    waitMsg.textContent = `${team} crew is on the hunt…`;
     bar.appendChild(waitMsg);
   }
 

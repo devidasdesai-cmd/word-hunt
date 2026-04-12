@@ -143,7 +143,7 @@ function switchTurn(game) {
   game.phase = 'captain-clue';
   game.clue = null;
   game.guessesLeft = 0;
-  addLog(game, `${game.currentTeam === 'red' ? 'Red' : 'Blue'} team's turn`);
+  addLog(game, `${game.currentTeam === 'red' ? 'Red' : 'Blue'} crew sets out!`);
 }
 
 // ─── Socket handlers ──────────────────────────────────
@@ -237,7 +237,7 @@ io.on('connection', (socket) => {
     }
 
     game.phase = 'captain-clue';
-    addLog(game, `Game started! ${game.startTeam === 'red' ? 'Red' : 'Blue'} goes first — 6 cards each, score to win!`);
+    addLog(game, `The hunt begins! ${game.startTeam === 'red' ? 'Red' : 'Blue'} crew leads the expedition — find your cards and claim the treasure!`);
     broadcastState(game);
   });
 
@@ -361,7 +361,7 @@ io.on('connection', (socket) => {
     if (!player || player.team !== game.currentTeam) return;
     if (game.phase !== 'guessing') return;
 
-    addLog(game, `${player.name} ended the turn`);
+    addLog(game, `${player.name} decided to take a nap`);
     switchTurn(game);
     broadcastState(game);
   });
@@ -446,5 +446,5 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3000;
 server.listen(PORT, () => {
-  console.log(`Word Rush server running at http://localhost:${PORT}`);
+  console.log(`Word Hunt server running at http://localhost:${PORT}`);
 });
