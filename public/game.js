@@ -79,12 +79,12 @@ function cap(s) { return s ? s[0].toUpperCase() + s.slice(1) : ''; }
 function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
 function roleLabel(role) {
-  if (role === 'spymaster') return 'Word Captain';
-  if (role === 'operative') return 'Scout';
+  if (role === 'spymaster') return 'Pathfinder';
+  if (role === 'operative') return 'Seeker';
   return cap(role);
 }
 function roleBadgeShort(role) {
-  return role === 'spymaster' ? 'Captain' : 'Scout';
+  return role === 'spymaster' ? 'Pathfinder' : 'Seeker';
 }
 
 // ─── Main render ─────────────────────────────────────
@@ -102,7 +102,7 @@ function render() {
   if (state.phase !== 'lobby' && state.phase !== 'ended') {
     turnDot.className = `turn-dot ${state.currentTeam}`;
     const team  = state.currentTeam === 'red' ? 'Red' : 'Blue';
-    const phase = state.phase === 'captain-clue' ? 'Captain Clue' : 'Guessing';
+    const phase = state.phase === 'captain-clue' ? 'Pathfinder Clue' : 'Guessing';
     turnText.textContent = `${team} — ${phase}`;
   } else if (state.phase === 'ended') {
     turnDot.className = 'turn-dot';
@@ -284,7 +284,7 @@ function renderActionBar() {
       const msg = document.createElement('div');
       msg.className = 'waiting-msg';
       const team = state.currentTeam === 'red' ? 'Red' : 'Blue';
-      msg.textContent = `Waiting for ${team} Word Captain to give a clue…`;
+      msg.textContent = `Waiting for ${team} Pathfinder to give a clue…`;
       actionBar.appendChild(msg);
     }
   } else if (state.phase === 'guessing') {
@@ -307,10 +307,10 @@ function renderLobbyActions() {
     return btn;
   }
 
-  wrap.appendChild(makeBtn('Red',  'Scout',        'red',  'operative', 'red-op'));
-  wrap.appendChild(makeBtn('Red',  'Word Captain', 'red',  'spymaster', 'red-sp'));
-  wrap.appendChild(makeBtn('Blue', 'Scout',        'blue', 'operative', 'blue-op'));
-  wrap.appendChild(makeBtn('Blue', 'Word Captain', 'blue', 'spymaster', 'blue-sp'));
+  wrap.appendChild(makeBtn('Red',  'Seeker',      'red',  'operative', 'red-op'));
+  wrap.appendChild(makeBtn('Red',  'Pathfinder',  'red',  'spymaster', 'red-sp'));
+  wrap.appendChild(makeBtn('Blue', 'Seeker',      'blue', 'operative', 'blue-op'));
+  wrap.appendChild(makeBtn('Blue', 'Pathfinder',  'blue', 'spymaster', 'blue-sp'));
 
   const startBtn = document.createElement('button');
   startBtn.className = 'start-btn';
@@ -335,13 +335,13 @@ function renderMidGameJoin() {
 
   const label = document.createElement('span');
   label.className = 'waiting-msg';
-  label.textContent = 'Join as Scout:';
+  label.textContent = 'Join as Seeker:';
   wrap.appendChild(label);
 
   ['red', 'blue'].forEach(team => {
     const btn = document.createElement('button');
     btn.className = `team-pick-btn ${team}-op`;
-    btn.innerHTML = `${cap(team)}<span class="role-label">Scout</span>`;
+    btn.innerHTML = `${cap(team)}<span class="role-label">Seeker</span>`;
     btn.addEventListener('click', () => socket.emit('set-team', { team, role: 'operative' }));
     wrap.appendChild(btn);
   });
