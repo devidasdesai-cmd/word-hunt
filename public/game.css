@@ -551,131 +551,157 @@ body {
   text-align: center;
 }
 
-/* ─── Board — Hexagonal 3-4-5-4-3 layout ─────────── */
+/* ─── Board — circular 3-4-5-4-3 cluster layout ────── */
 .board {
   flex: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
   justify-content: center;
-  gap: 5px;
+  gap: 8px;
   min-height: 0;
-  /* width of widest row (5 cards × 116px + 4 gaps × 5px) */
-  width: 600px;
+  /* widest row: 5 × 96px + 4 × 8px gap */
+  width: 512px;
   margin: 0 auto;
 }
 
-/* Hex rows: 3-4-5-4-3 */
+/* Circular cluster rows: 3-4-5-4-3 */
 .hex-row {
   display: flex;
-  gap: 5px;
+  gap: 8px;
   flex-shrink: 0;
 }
 
-/* Offset rows to form hexagonal cluster */
+/* Offset each row so circles nest into the gaps of the row above */
 .hex-row-5 { margin-left: 0; }
-.hex-row-4 { margin-left: 60px; }   /* (116+5)/2 ≈ 60 */
-.hex-row-3 { margin-left: 121px; }  /* 116+5 = 121 */
+.hex-row-4 { margin-left: 52px; }   /* (96+8)/2 = 52 */
+.hex-row-3 { margin-left: 104px; }  /* 96+8 = 104 */
 
-/* ─── Card — flat-top hexagon ─────────────────────── */
+/* ─── Card — circle ───────────────────────────────── */
 .card {
-  width: 116px;
-  height: 100px;
+  width: 96px;
+  height: 96px;
   flex-shrink: 0;
-  /* Flat-top hexagon */
-  clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%);
+  border-radius: 50%;
+  border: 1.5px solid var(--border2);
   background: var(--surface2);
   display: flex;
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: 0.25rem 1.6rem;
+  padding: 0.2rem 0.8rem;
   cursor: default;
   position: relative;
-  transition: filter 0.18s, transform 0.18s;
+  transition: transform 0.16s, box-shadow 0.16s, background 0.16s, border-color 0.16s;
   user-select: none;
   -webkit-tap-highlight-color: transparent;
-  border-radius: 0;
-  border: none;
 }
 
 .card-word {
-  font-size: 0.72rem;
+  font-size: 0.64rem;
   font-weight: 700;
-  letter-spacing: 0.04em;
+  letter-spacing: 0.05em;
   text-transform: uppercase;
   color: var(--text);
-  line-height: 1.25;
+  line-height: 1.3;
   word-break: break-word;
   hyphens: auto;
 }
 
 /* ── Spymaster color hints ─────────────────────────── */
-.card.hint-red     { background: rgba(192,57,43,0.18); }
-.card.hint-blue    { background: rgba(41,128,185,0.18); }
-.card.hint-neutral { background: var(--surface2); }
-.card.hint-abyss   { background: rgba(10,4,30,0.75); }
-.card.hint-treasure { background: rgba(240,192,64,0.14); }
+.card.hint-red {
+  background: rgba(192,57,43,0.15);
+  border-color: rgba(231,76,60,0.45);
+  box-shadow: 0 0 0 3px rgba(231,76,60,0.07) inset;
+}
+.card.hint-blue {
+  background: rgba(26,82,118,0.18);
+  border-color: rgba(52,152,219,0.45);
+  box-shadow: 0 0 0 3px rgba(52,152,219,0.07) inset;
+}
+.card.hint-neutral {
+  background: var(--surface2);
+  border-color: var(--border2);
+}
+.card.hint-abyss {
+  background: rgba(8,4,20,0.8);
+  border-color: rgba(255,255,255,0.06);
+}
+.card.hint-treasure {
+  background: rgba(240,192,64,0.1);
+  border-color: rgba(240,192,64,0.45);
+  box-shadow: 0 0 0 3px rgba(240,192,64,0.06) inset;
+}
 
-.card.hint-red .card-word      { color: rgba(231,76,60,0.92); }
-.card.hint-blue .card-word     { color: rgba(52,152,219,0.92); }
-.card.hint-abyss .card-word    { color: rgba(255,255,255,0.2); }
-.card.hint-treasure .card-word { color: rgba(240,192,64,0.9); }
+.card.hint-red .card-word      { color: rgba(231,76,60,0.9); }
+.card.hint-blue .card-word     { color: rgba(52,152,219,0.9); }
+.card.hint-abyss .card-word    { color: rgba(255,255,255,0.18); }
+.card.hint-treasure .card-word { color: rgba(240,192,64,0.88); }
 
-/* Color dot — positioned at top center (safely inside hex shape) */
+/* Color dot — centred near top of circle */
 .card .color-dot {
   position: absolute;
-  top: 10px;
+  top: 11px;
   left: 50%;
   transform: translateX(-50%);
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
   border-radius: 50%;
-  opacity: 0.8;
+  opacity: 0.85;
   flex-shrink: 0;
 }
 
 /* ── Revealed cards ───────────────────────────────── */
-.card.revealed { cursor: default !important; }
+.card.revealed {
+  cursor: default !important;
+  border-color: transparent;
+}
 
 .card.revealed-red {
-  background: linear-gradient(135deg, #7b241c, #c0392b);
+  background: radial-gradient(circle at 40% 35%, #e74c3c, #922b21);
+  box-shadow: 0 2px 12px rgba(192,57,43,0.35);
 }
-.card.revealed-red .card-word { color: rgba(255,255,255,0.9); }
+.card.revealed-red .card-word { color: rgba(255,255,255,0.92); }
 
 .card.revealed-blue {
-  background: linear-gradient(135deg, #154360, #1a6090);
+  background: radial-gradient(circle at 40% 35%, #3498db, #1a5276);
+  box-shadow: 0 2px 12px rgba(26,82,118,0.4);
 }
-.card.revealed-blue .card-word { color: rgba(255,255,255,0.9); }
+.card.revealed-blue .card-word { color: rgba(255,255,255,0.92); }
 
 .card.revealed-neutral {
-  background: #252830;
-  opacity: 0.5;
+  background: #1e2030;
+  border-color: rgba(255,255,255,0.04) !important;
+  opacity: 0.45;
 }
-.card.revealed-neutral .card-word { color: rgba(255,255,255,0.3); }
+.card.revealed-neutral .card-word { color: rgba(255,255,255,0.28); }
 
 .card.revealed-abyss {
-  background: #07040f;
-  opacity: 0.7;
+  background: radial-gradient(circle at 40% 35%, #1a0a2e, #07040f);
+  box-shadow: 0 0 16px rgba(80,0,120,0.25);
+  opacity: 0.75;
 }
 .card.revealed-abyss .card-word { color: rgba(255,255,255,0.18); }
 
 .card.revealed-treasure {
-  background: linear-gradient(135deg, #7d6008, #d4ac0d);
+  background: radial-gradient(circle at 40% 35%, #f0c040, #9a7d0a);
+  box-shadow: 0 2px 16px rgba(240,192,64,0.4);
+  border-color: rgba(240,192,64,0.5) !important;
 }
 .card.revealed-treasure .card-word {
-  color: rgba(0,0,0,0.85);
+  color: rgba(0,0,0,0.82);
   font-weight: 800;
 }
 
 /* ── Clickable cards (scouts) ─────────────────────── */
 .card.clickable { cursor: pointer; }
 .card.clickable:hover {
-  filter: brightness(1.25);
-  transform: translateY(-3px);
+  transform: scale(1.1);
+  box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  border-color: rgba(255,255,255,0.3);
+  z-index: 1;
 }
 .card.clickable:active {
-  filter: brightness(0.9);
   transform: scale(0.96);
 }
 
@@ -912,19 +938,15 @@ body {
     font-size: 0.75rem;
   }
 
-  /* Board: scale down hex layout on mobile */
+  /* Board: scale down circle layout on mobile */
   .board {
     flex: none;
     height: auto;
     transform-origin: top center;
-    transform: scale(0.62);
-    margin-top: -76px;  /* compensate for scale shrink */
-    margin-bottom: -76px;
+    transform: scale(0.65);
+    margin-top: -72px;
+    margin-bottom: -72px;
     pointer-events: auto;
-  }
-
-  .card-word {
-    font-size: 0.68rem;
   }
 
   /* Log shorter */
@@ -1045,21 +1067,22 @@ body {
 }
 
 /* ─── Peek card states ────────────────────────────── */
-/* Cursor when in peek mode */
 body.peek-mode .card.peekable { cursor: crosshair; }
 
 body.peek-mode .card.peekable:hover {
-  transform: translateY(-3px);
-  filter: brightness(1.1) drop-shadow(0 0 6px #9b59b6);
+  transform: scale(1.1);
+  box-shadow: 0 0 0 3px #9b59b6, 0 6px 20px rgba(0,0,0,0.4);
+  border-color: #9b59b6;
 }
 
-/* Peek result overlays — use filter since box-shadow is clipped by clip-path */
 .card.peek-safe {
-  filter: drop-shadow(0 0 5px #2ecc71);
+  box-shadow: 0 0 0 3px #2ecc71, 0 0 16px rgba(46,204,113,0.25);
+  border-color: #2ecc71 !important;
 }
 
 .card.peek-danger {
-  filter: drop-shadow(0 0 5px #e74c3c);
+  box-shadow: 0 0 0 3px #e74c3c, 0 0 16px rgba(231,76,60,0.25);
+  border-color: #e74c3c !important;
 }
 
 .peek-overlay {
@@ -1068,12 +1091,12 @@ body.peek-mode .card.peekable:hover {
   display: flex;
   align-items: center;
   justify-content: center;
-  border-radius: inherit;
-  font-size: 0.65rem;
+  border-radius: 50%;
+  font-size: 0.58rem;
   font-weight: 800;
   letter-spacing: 0.1em;
-  background: rgba(0,0,0,0.55);
-  backdrop-filter: blur(2px);
+  background: rgba(0,0,0,0.6);
+  backdrop-filter: blur(3px);
   animation: peek-fade 3s ease forwards;
 }
 

@@ -159,13 +159,26 @@ function renderHeaderRight() {
 }
 
 // ─── Side panel players ──────────────────────────────
+// Sort within each team: spymaster (Pathfinder) first, then operatives (Seekers)
+function sortByRole(players) {
+  return [...players].sort((a, b) => {
+    if (a.role === 'spymaster' && b.role !== 'spymaster') return -1;
+    if (b.role === 'spymaster' && a.role !== 'spymaster') return 1;
+    return 0;
+  });
+}
+
 function renderPlayers() {
   redPlayers.innerHTML = '';
   bluePlayers.innerHTML = '';
   specPlayers.innerHTML = '';
   let hasSpec = false;
 
-  state.players.forEach(p => {
+  const redSorted  = sortByRole(state.players.filter(p => p.team === 'red'));
+  const blueSorted = sortByRole(state.players.filter(p => p.team === 'blue'));
+  const unassigned = state.players.filter(p => !p.team);
+
+  [...redSorted, ...blueSorted, ...unassigned].forEach(p => {
     const chip = document.createElement('div');
     chip.className = `player-chip${p.role === 'spymaster' ? ' spymaster' : ''}`;
     const badge = p.role ? `<span class="role-badge">${roleBadgeShort(p.role)}</span>` : '';
@@ -186,7 +199,7 @@ function renderMobilePlayers() {
   mobilePlayers.style.display = '';
 
   ['red', 'blue'].forEach(team => {
-    const players = state.players.filter(p => p.team === team);
+    const players = sortByRole(state.players.filter(p => p.team === team));
     if (!players.length) return;
     const group = document.createElement('div');
     group.className = `mob-team mob-team-${team}`;
