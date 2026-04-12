@@ -485,21 +485,15 @@ function renderGuessingBar() {
     word.style.color = teamColor;
     word.textContent = state.clue.word;
 
+    // Count is informational only — shown as "for N" hint from pathfinder
     const count = document.createElement('span');
     count.className = 'clue-count-display';
-    count.textContent = state.clue.count === 0 ? '∞' : state.clue.count;
+    count.textContent = state.clue.count === 0 ? '' : `for ${state.clue.count}`;
 
     clueDisp.appendChild(word);
-    clueDisp.appendChild(count);
+    if (state.clue.count !== 0) clueDisp.appendChild(count);
     bar.appendChild(clueDisp);
   }
-
-  // Guesses left
-  const gl = state.guessesLeft === Infinity ? '∞' : state.guessesLeft;
-  const guessesEl = document.createElement('span');
-  guessesEl.className = 'guesses-left';
-  guessesEl.textContent = `${gl} guess${gl !== 1 ? 'es' : ''} left`;
-  bar.appendChild(guessesEl);
 
   if (isMyTurn) {
     // ── Power-ups ──────────────────────────────────

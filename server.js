@@ -254,7 +254,7 @@ io.on('connection', (socket) => {
     if (!clueWord || isNaN(clueCount) || clueCount < 0 || clueCount > 9) return;
 
     game.clue = { word: clueWord, count: clueCount };
-    game.guessesLeft = clueCount === 0 ? Infinity : clueCount + 1;
+    game.guessesLeft = Infinity; // seekers guess freely; turn ends on wrong card or End Turn
     game.phase = 'guessing';
     game.roundCorrect = 0;
 
@@ -349,9 +349,7 @@ io.on('connection', (socket) => {
       return;
     }
 
-    // ── Correct own card: decrement guesses ───────────
-    game.guessesLeft--;
-    if (game.guessesLeft <= 0) switchTurn(game);
+    // Correct own card — no guess cap, seeker keeps playing
     broadcastState(game);
   });
 
