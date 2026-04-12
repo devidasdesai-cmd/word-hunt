@@ -337,10 +337,10 @@ function renderLobbyActions() {
     return btn;
   }
 
-  wrap.appendChild(makeBtn('Red',  'Seeker',      'red',  'operative', 'red-op'));
   wrap.appendChild(makeBtn('Red',  'Pathfinder',  'red',  'spymaster', 'red-sp'));
-  wrap.appendChild(makeBtn('Blue', 'Seeker',      'blue', 'operative', 'blue-op'));
+  wrap.appendChild(makeBtn('Red',  'Seeker',      'red',  'operative', 'red-op'));
   wrap.appendChild(makeBtn('Blue', 'Pathfinder',  'blue', 'spymaster', 'blue-sp'));
+  wrap.appendChild(makeBtn('Blue', 'Seeker',      'blue', 'operative', 'blue-op'));
 
   const startBtn = document.createElement('button');
   startBtn.className = 'start-btn';

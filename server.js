@@ -225,12 +225,8 @@ io.on('connection', (socket) => {
     const hasRedSco  = players.some(p => p.team === 'red'  && p.role === 'operative');
     const hasBlueSco = players.some(p => p.team === 'blue' && p.role === 'operative');
 
-    if (!hasRedCap || !hasRedSco) {
-      socket.emit('error', { message: 'Red team needs at least one Pathfinder and one Seeker' });
-      return;
-    }
-    if (!hasBlueCap || !hasBlueSco) {
-      socket.emit('error', { message: 'Blue team needs at least one Pathfinder and one Seeker' });
+    if (!hasRedCap || !hasRedSco || !hasBlueCap || !hasBlueSco) {
+      socket.emit('error', { message: 'Both teams need a Pathfinder and at least one Seeker before the game can begin.' });
       return;
     }
 
