@@ -11,14 +11,17 @@
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     :root {
-      --bg: #0b0d14;
-      --surface: #161926;
-      --surface2: #1e2236;
-      --border: rgba(255,255,255,0.07);
-      --border2: rgba(255,255,255,0.13);
-      --text: #e8eaf0;
-      --text-muted: #6b7094;
-      --text-dim: #9095b0;
+      --bg:      #07080e;
+      --surface: #0c0e1b;
+      --surface2:#11142a;
+      --border:  rgba(255,255,255,0.055);
+      --border2: rgba(255,255,255,0.1);
+      --border-gold: rgba(184,146,58,0.3);
+      --text:    #dde0ec;
+      --text-muted: #505570;
+      --text-dim:#828aac;
+      --gold:    #b8923a;
+      --gold-bright: #e2c46a;
     }
 
     html, body { height: 100%; }
@@ -34,8 +37,18 @@
       padding: 2rem 1.5rem;
     }
 
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(27,74,122,0.07) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 100%, rgba(154,34,50,0.05) 0%, transparent 55%);
+      pointer-events: none;
+    }
+
     /* ── Wrapper ── */
     .page {
+      position: relative;
       width: 100%;
       max-width: 400px;
       display: flex;
@@ -44,52 +57,48 @@
     }
 
     /* ── Brand ── */
-    .brand {
-      text-align: center;
-    }
+    .brand { text-align: center; }
 
     .brand h1 {
       font-family: 'Playfair Display', serif;
-      font-size: 3.2rem;
-      letter-spacing: 0.03em;
+      font-size: 3.4rem;
+      letter-spacing: 0.04em;
       line-height: 1;
-      background: linear-gradient(135deg, #e74c3c 0%, #c0392b 38%, #2980b9 62%, #1a5276 100%);
+      background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 50%, var(--gold-bright) 100%);
       -webkit-background-clip: text;
       -webkit-text-fill-color: transparent;
       background-clip: text;
-      margin-bottom: 0.6rem;
+      margin-bottom: 0.65rem;
     }
 
     .brand .tagline {
       color: var(--text-muted);
-      font-size: 0.75rem;
-      letter-spacing: 0.2em;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.72rem;
+      letter-spacing: 0.22em;
       text-transform: uppercase;
-      font-weight: 500;
+      font-style: italic;
     }
 
     /* ── Form panel ── */
     .panel {
       background: var(--surface);
-      border: 1px solid var(--border2);
+      border: 1px solid var(--border-gold);
       border-radius: 18px;
       padding: 2rem;
       display: flex;
       flex-direction: column;
       gap: 1.5rem;
+      box-shadow: 0 8px 32px rgba(0,0,0,0.4), 0 0 0 1px rgba(255,255,255,0.03);
     }
 
     /* ── Field ── */
-    .field {
-      display: flex;
-      flex-direction: column;
-      gap: 0.45rem;
-    }
+    .field { display: flex; flex-direction: column; gap: 0.45rem; }
 
     .field label {
+      font-family: 'Playfair Display', serif;
       font-size: 0.68rem;
-      font-weight: 600;
-      letter-spacing: 0.15em;
+      letter-spacing: 0.18em;
       text-transform: uppercase;
       color: var(--text-muted);
     }
@@ -109,63 +118,49 @@
     }
 
     .field input:focus {
-      border-color: rgba(255,255,255,0.3);
-      box-shadow: 0 0 0 3px rgba(255,255,255,0.04);
+      border-color: var(--border-gold);
+      box-shadow: 0 0 0 3px rgba(184,146,58,0.08);
     }
 
-    .field input::placeholder {
-      color: var(--text-muted);
-      font-weight: 400;
-    }
+    .field input::placeholder { color: var(--text-muted); font-weight: 400; }
 
     /* ── Primary CTA ── */
     .btn-primary {
       width: 100%;
       padding: 0.9rem 1rem;
-      background: linear-gradient(135deg, #e74c3c, #c0392b);
-      color: #fff;
+      background: linear-gradient(135deg, var(--gold-bright), var(--gold));
+      color: #1a1000;
       border: none;
       border-radius: 10px;
-      font-family: 'Inter', sans-serif;
-      font-size: 0.95rem;
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
       font-weight: 700;
-      letter-spacing: 0.04em;
+      letter-spacing: 0.05em;
       cursor: pointer;
-      transition: opacity 0.18s, transform 0.18s;
+      transition: opacity 0.18s, transform 0.18s, box-shadow 0.18s;
+      box-shadow: 0 2px 12px rgba(184,146,58,0.22);
     }
 
-    .btn-primary:hover  { opacity: 0.88; transform: translateY(-1px); }
+    .btn-primary:hover  { opacity: 0.9; transform: translateY(-1px); box-shadow: 0 4px 18px rgba(184,146,58,0.32); }
     .btn-primary:active { opacity: 1; transform: scale(0.98); }
 
     /* ── Divider ── */
-    .divider {
-      display: flex;
-      align-items: center;
-      gap: 0.9rem;
-    }
+    .divider { display: flex; align-items: center; gap: 0.9rem; }
 
     .divider::before,
-    .divider::after {
-      content: '';
-      flex: 1;
-      height: 1px;
-      background: var(--border2);
-    }
+    .divider::after { content: ''; flex: 1; height: 1px; background: var(--border-gold); opacity: 0.5; }
 
     .divider span {
-      font-size: 0.7rem;
-      font-weight: 500;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
+      font-family: 'Playfair Display', serif;
+      font-size: 0.68rem;
+      font-style: italic;
+      letter-spacing: 0.1em;
       color: var(--text-muted);
       white-space: nowrap;
     }
 
     /* ── Join row ── */
-    .join-row {
-      display: flex;
-      gap: 0.5rem;
-    }
+    .join-row { display: flex; gap: 0.5rem; }
 
     .join-row input {
       flex: 1;
@@ -185,8 +180,8 @@
     }
 
     .join-row input:focus {
-      border-color: rgba(255,255,255,0.3);
-      box-shadow: 0 0 0 3px rgba(255,255,255,0.04);
+      border-color: var(--border-gold);
+      box-shadow: 0 0 0 3px rgba(184,146,58,0.08);
     }
 
     .join-row input::placeholder {
@@ -214,34 +209,31 @@
     }
 
     .btn-secondary:hover {
-      border-color: rgba(255,255,255,0.28);
+      border-color: var(--border-gold);
       color: var(--text);
-      background: rgba(255,255,255,0.06);
+      background: rgba(184,146,58,0.06);
     }
 
     .btn-secondary:active { transform: scale(0.98); }
 
     /* ── Error ── */
-    .error-msg {
-      font-size: 0.75rem;
-      font-weight: 500;
-      color: #e74c3c;
-      min-height: 1em;
-    }
+    .error-msg { font-size: 0.74rem; font-weight: 500; color: #c0392b; min-height: 1em; }
 
     /* ── Footer ── */
     .footer {
       text-align: center;
+      font-family: 'Playfair Display', serif;
       font-size: 0.68rem;
+      font-style: italic;
       color: var(--text-muted);
-      opacity: 0.5;
+      opacity: 0.55;
       letter-spacing: 0.07em;
     }
 
     /* ── Mobile ── */
     @media (max-width: 480px) {
       body { align-items: flex-start; padding-top: 3rem; }
-      .brand h1 { font-size: 2.75rem; }
+      .brand h1 { font-size: 2.8rem; }
       .panel { padding: 1.6rem 1.4rem; gap: 1.25rem; }
     }
 
@@ -251,26 +243,29 @@
 
     /* ── Light Mode ── */
     [data-theme="light"] {
-      --bg: #f0f2f9;
-      --surface: #ffffff;
-      --surface2: #e8eaf5;
-      --border: rgba(0,0,0,0.07);
-      --border2: rgba(0,0,0,0.13);
-      --text: #1e2140;
-      --text-muted: #7b80ab;
-      --text-dim: #5a5f8a;
+      --bg:      #eeecdf;
+      --surface: #f7f5ec;
+      --surface2:#e8e5d5;
+      --border:  rgba(80,60,20,0.1);
+      --border2: rgba(80,60,20,0.18);
+      --border-gold: rgba(140,100,20,0.35);
+      --text:    #1e1c14;
+      --text-muted: #7a7258;
+      --text-dim:#5a5440;
+      --gold:    #8c6614;
+      --gold-bright: #c0952c;
     }
 
     [data-theme="light"] .field input:focus,
     [data-theme="light"] .join-row input:focus {
-      border-color: rgba(0,0,0,0.28);
-      box-shadow: 0 0 0 3px rgba(0,0,0,0.04);
+      border-color: rgba(140,100,20,0.4);
+      box-shadow: 0 0 0 3px rgba(140,100,20,0.06);
     }
 
     [data-theme="light"] .btn-secondary:hover {
-      border-color: rgba(0,0,0,0.22);
+      border-color: rgba(140,100,20,0.35);
       color: var(--text);
-      background: rgba(0,0,0,0.04);
+      background: rgba(140,100,20,0.05);
     }
 
     /* ── Theme Toggle ── */
@@ -292,7 +287,7 @@
       z-index: 10;
       transition: color 0.2s, border-color 0.2s;
     }
-    .theme-toggle:hover { color: var(--text); border-color: var(--text-dim); }
+    .theme-toggle:hover { color: var(--gold-bright); border-color: var(--border-gold); }
   </style>
 </head>
 <body>

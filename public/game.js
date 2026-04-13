@@ -166,7 +166,7 @@ function render() {
     turnText.textContent = state.winner === 'tie' ? 'Draw' : 'Game Over';
   } else {
     turnDot.className = 'turn-dot';
-    turnText.textContent = state.rapidMode ? 'Lobby — Rapid Mode' : 'Lobby';
+    turnText.textContent = state.rapidMode ? 'Awaiting — Rapid' : 'Awaiting Expedition';
   }
 
   renderHeaderRight();
@@ -187,11 +187,39 @@ function renderHeaderRight() {
   const inGame    = state.phase !== 'lobby' && state.phase !== 'ended';
 
   if (state.myTeam && state.myRole) {
+    const wrap = document.createElement('div');
+    wrap.className = 'role-badge-wrap';
+
     const badge = document.createElement('div');
     badge.className = 'my-role-bar';
-    const color = state.myTeam === 'red' ? '#e74c3c' : '#3498db';
-    badge.innerHTML = `<span style="color:${color}">${cap(state.myTeam)}</span> <span>${roleLabel(state.myRole)}</span>`;
-    headerRight.appendChild(badge);
+    const teamColor = state.myTeam === 'red' ? 'var(--red-bright)' : 'var(--blue-bright)';
+    badge.innerHTML =
+      `<span class="role-bar-team" style="color:${teamColor}">${cap(state.myTeam)}</span>` +
+      `<span class="role-bar-divider">·</span>` +
+      `<span class="role-bar-role">${roleLabel(state.myRole)}</span>` +
+      `<svg class="role-bar-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>`;
+
+    const dropdown = document.createElement('div');
+    dropdown.className = 'role-change-dropdown';
+
+    const ROLE_OPTS = [
+      { team: 'red',  role: 'spymaster', label: 'Red Pathfinder',  css: 'red-sp' },
+      { team: 'red',  role: 'operative', label: 'Red Seeker',      css: 'red-op' },
+      { team: 'blue', role: 'spymaster', label: 'Blue Pathfinder', css: 'blue-sp' },
+      { team: 'blue', role: 'operative', label: 'Blue Seeker',     css: 'blue-op' },
+    ];
+    ROLE_OPTS.forEach(opt => {
+      const btn = document.createElement('button');
+      btn.className = `role-change-option ${opt.css}`;
+      if (state.myTeam === opt.team && state.myRole === opt.role) btn.classList.add('active');
+      btn.textContent = opt.label;
+      btn.addEventListener('click', () => socket.emit('set-team', { team: opt.team, role: opt.role }));
+      dropdown.appendChild(btn);
+    });
+
+    wrap.appendChild(badge);
+    wrap.appendChild(dropdown);
+    headerRight.appendChild(wrap);
   }
 
   if (isCaptain && inGame) {
@@ -396,25 +424,9 @@ function renderLobbyActions() {
   const wrap = document.createElement('div');
   wrap.className = 'lobby-actions';
 
-  const { myTeam, myRole } = state;
-
-  function makeBtn(label, sublabel, teamVal, roleVal, cssClass) {
-    const btn = document.createElement('button');
-    btn.className = `team-pick-btn ${cssClass}`;
-    if (myTeam === teamVal && myRole === roleVal) btn.classList.add('active');
-    btn.innerHTML = `${label}<span class="role-label">${sublabel}</span>`;
-    btn.addEventListener('click', () => socket.emit('set-team', { team: teamVal, role: roleVal }));
-    return btn;
-  }
-
-  wrap.appendChild(makeBtn('Red',  'Pathfinder',  'red',  'spymaster', 'red-sp'));
-  wrap.appendChild(makeBtn('Red',  'Seeker',      'red',  'operative', 'red-op'));
-  wrap.appendChild(makeBtn('Blue', 'Pathfinder',  'blue', 'spymaster', 'blue-sp'));
-  wrap.appendChild(makeBtn('Blue', 'Seeker',      'blue', 'operative', 'blue-op'));
-
   const startBtn = document.createElement('button');
   startBtn.className = 'start-btn';
-  startBtn.textContent = 'Start Game';
+  startBtn.textContent = 'Begin Expedition';
   startBtn.addEventListener('click', () => socket.emit('start-game'));
   wrap.appendChild(startBtn);
 
