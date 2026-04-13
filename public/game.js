@@ -40,10 +40,15 @@ document.getElementById('copy-link-btn').addEventListener('click', () => {
 });
 
 // ─── Socket events ───────────────────────────────────
-socket.emit('join-room', {
-  roomCode,
-  playerId,
-  name: localStorage.getItem('wordhunt-name') || localStorage.getItem('wordrush-name') || 'Player',
+// Re-emit join-room on every (re)connect so server-side closure variables
+// (currentRoom, currentPlayerId) are always set — fixes powerups/actions
+// silently failing after any socket reconnection.
+socket.on('connect', () => {
+  socket.emit('join-room', {
+    roomCode,
+    playerId,
+    name: localStorage.getItem('wordhunt-name') || localStorage.getItem('wordrush-name') || 'Player',
+  });
 });
 
 socket.on('room-joined', ({ playerId: assignedId }) => {

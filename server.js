@@ -307,17 +307,22 @@ io.on('connection', (socket) => {
       game.treasureTeam = game.currentTeam;
       addLog(game, `${player.name} found the Treasure! +1 bonus point for ${game.currentTeam === 'red' ? 'Red' : 'Blue'}!`);
       broadcastState(game);
+      return; // turn keeps going — do NOT fall through to switchTurn
+    }
+
+    // ── Neutral / opponent card: switch turn ──────────
+    if (!isOwnCard) {
+      switchTurn(game);
+      broadcastState(game);
       return;
     }
 
     // ── Own card: score a point ───────────────────────
-    if (isOwnCard) {
+    game.scores[game.currentTeam]++;
+    game.roundCorrect++;
+    if (game.roundCorrect === 3) {
       game.scores[game.currentTeam]++;
-      game.roundCorrect++;
-      if (game.roundCorrect === 3) {
-        game.scores[game.currentTeam]++;
-        addLog(game, `3-in-a-row bonus! +1 extra point for ${game.currentTeam === 'red' ? 'Red' : 'Blue'}!`);
-      }
+      addLog(game, `3-in-a-row bonus! +1 extra point for ${game.currentTeam === 'red' ? 'Red' : 'Blue'}!`);
     }
 
     // ── Check natural game end (all team cards revealed) ─
@@ -341,14 +346,7 @@ io.on('connection', (socket) => {
       return;
     }
 
-    // ── Wrong card (neutral or opponent): switch turn ─
-    if (!isOwnCard) {
-      switchTurn(game);
-      broadcastState(game);
-      return;
-    }
-
-    // Correct own card — no guess cap, seeker keeps playing
+    // Correct own card — seeker keeps playing
     broadcastState(game);
   });
 
