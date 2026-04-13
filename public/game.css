@@ -540,6 +540,24 @@ body::before {
   justify-content: center;
 }
 
+/* Header gear button — always-visible settings shortcut */
+.settings-header-gear {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 30px;
+  height: 30px;
+  border-radius: 50%;
+  border: 1px solid var(--border2);
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: color 0.15s, border-color 0.15s;
+  touch-action: manipulation;
+}
+.settings-header-gear:hover { color: var(--gold-bright); border-color: var(--border-gold); }
+
 /* Settings toggle button */
 .settings-toggle-btn {
   display: flex;
@@ -607,6 +625,17 @@ body::before {
 }
 
 .settings-inline-row {
+  /* Reset <button> styles */
+  appearance: none;
+  -webkit-appearance: none;
+  border: none;
+  background: transparent;
+  width: 100%;
+  text-align: left;
+  font-family: inherit;
+  font-size: inherit;
+  color: inherit;
+  /* Layout */
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -616,7 +645,11 @@ body::before {
   padding: 0.7rem 0.5rem;
   transition: background 0.15s;
 }
-.settings-inline-row:hover { background: rgba(255,255,255,0.035); }
+.settings-inline-row:hover:not(:disabled) { background: rgba(255,255,255,0.05); }
+.settings-inline-row:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
+}
 
 .settings-inline-label-group { display: flex; flex-direction: column; gap: 0.12rem; }
 
@@ -759,16 +792,7 @@ body::before {
   background: #1a1000;
 }
 
-/* Duration row (shown when Rapid is on) */
-.duration-row {
-  display: flex;
-  align-items: center;
-  gap: 0.35rem;
-  font-size: 0.74rem;
-  font-weight: 500;
-  color: var(--text-dim);
-  letter-spacing: 0.01em;
-}
+/* Duration input — inline inside the Rapid Mode settings row */
 .duration-input {
   width: 54px;
   padding: 0.28rem 0.4rem;
@@ -782,10 +806,14 @@ body::before {
   outline: none;
   transition: border-color 0.18s;
   -moz-appearance: textfield;
+  flex-shrink: 0;
 }
 .duration-input::-webkit-inner-spin-button,
 .duration-input::-webkit-outer-spin-button { -webkit-appearance: none; }
 .duration-input:focus { border-color: var(--border-gold); }
+
+/* Inline variant: sits between label and toggle, no extra row */
+.settings-dur-inline { cursor: default; }
 
 /* ── Clue form (Pathfinder's turn) ─────────────────── */
 .clue-form {
@@ -1949,7 +1977,9 @@ body.peek-mode .card.peekable:hover {
 [data-theme="light"] .relic-shield { border-color: rgba(28,120,72,0.35); }
 [data-theme="light"] .relic-shield .relic-icon { background: rgba(28,120,72,0.1); }
 [data-theme="light"] .relic-card.relic-spent { opacity: 0.28; }
-[data-theme="light"] .settings-inline-row:hover { background: rgba(0,0,0,0.03); }
+[data-theme="light"] .settings-inline-row:hover:not(:disabled) { background: rgba(0,0,0,0.04); }
+[data-theme="light"] .settings-header-gear { border-color: rgba(0,0,0,0.12); }
+[data-theme="light"] .settings-header-gear:hover { color: var(--gold); border-color: rgba(140,100,14,0.45); }
 [data-theme="light"] .settings-toggle-btn { background: #e8ecf5; border-color: rgba(0,0,0,0.14); color: var(--text-dim); }
 [data-theme="light"] .settings-toggle-btn:hover { border-color: rgba(0,0,0,0.25); color: var(--text); }
 [data-theme="light"] .settings-toggle-btn.open { background: rgba(140,100,14,0.08); border-color: rgba(140,100,14,0.45); }

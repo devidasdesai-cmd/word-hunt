@@ -242,7 +242,7 @@ io.on('connection', (socket) => {
 
   socket.on('set-powerups-mode', ({ enabled }) => {
     const game = games[currentRoom];
-    if (!game || game.phase !== 'lobby') return;
+    if (!game) return;
     game.powerupsEnabled = !!enabled;
     broadcastState(game);
   });

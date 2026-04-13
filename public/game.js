@@ -215,6 +215,14 @@ function renderHeaderRight() {
   const isCaptain = state.myRole === 'spymaster';
   const inGame    = state.phase !== 'lobby' && state.phase !== 'ended';
 
+  // Settings gear — always accessible from the header
+  const gearBtn = document.createElement('button');
+  gearBtn.className = 'settings-header-gear';
+  gearBtn.title = 'Game Settings';
+  gearBtn.innerHTML = `<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06A1.65 1.65 0 0 0 4.68 15a1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.68a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06A1.65 1.65 0 0 0 19.4 9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>`;
+  gearBtn.addEventListener('click', openSettingsOverlay);
+  headerRight.appendChild(gearBtn);
+
   if (state.myTeam && state.myRole) {
     const wrap = document.createElement('div');
     wrap.className = 'role-badge-wrap';
@@ -449,10 +457,18 @@ function renderActionBar() {
   }
 }
 
-function buildSettingsRow(label, desc, active, onClick) {
-  const row = document.createElement('div');
+function buildSettingsRow(label, desc, active, onClick, disabled) {
+  // Use a real <button> so clicks are reliably captured in the overlay context
+  const row = document.createElement('button');
+  row.type = 'button';
   row.className = 'settings-inline-row';
-  row.addEventListener('click', onClick);
+
+  if (disabled) {
+    row.disabled = true;
+    row.title = 'Can only be changed in the lobby';
+  } else {
+    row.addEventListener('click', onClick);
+  }
 
   const grp = document.createElement('div');
   grp.className = 'settings-inline-label-group';
@@ -469,6 +485,7 @@ function buildSettingsRow(label, desc, active, onClick) {
   const sw = document.createElement('div');
   sw.className = `toggle-switch${active ? ' on' : ''}`;
   sw.style.flexShrink = '0';
+  sw.style.pointerEvents = 'none'; // let clicks pass through to the button
   const knob = document.createElement('div');
   knob.className = 'toggle-knob';
   sw.appendChild(knob);
@@ -480,36 +497,39 @@ function buildSettingsContent() {
   const panel = document.createElement('div');
   panel.className = 'settings-inline';
 
+  const inLobby = state.phase === 'lobby';
+
   // ── Rapid Mode ───────────────────────────────────
   const rapidRow = buildSettingsRow(
     'Rapid Mode',
-    'Sets a turn timer for each guessing phase',
+    inLobby ? 'Sets a turn timer for each guessing phase' : 'Sets a turn timer for each guessing phase · Lobby only',
     state.rapidMode,
-    () => socket.emit('set-rapid-mode', { enabled: !state.rapidMode, duration: state.rapidDuration || 60 })
+    () => socket.emit('set-rapid-mode', { enabled: !state.rapidMode, duration: state.rapidDuration || 60 }),
+    !inLobby
   );
-  panel.appendChild(rapidRow);
 
   if (state.rapidMode) {
-    const durRow = document.createElement('div');
-    durRow.className = 'duration-row';
+    // Embed duration input inline between label group and toggle switch
     const durInput = document.createElement('input');
     durInput.type = 'number';
-    durInput.className = 'duration-input';
+    durInput.className = 'duration-input settings-dur-inline';
     durInput.value = state.rapidDuration || 60;
     durInput.min = 15;
     durInput.max = 300;
     durInput.step = 5;
+    durInput.title = 'Seconds per turn';
     durInput.addEventListener('click', e => e.stopPropagation());
+    durInput.addEventListener('mousedown', e => e.stopPropagation());
     durInput.addEventListener('change', () => {
       const dur = Math.max(15, Math.min(300, parseInt(durInput.value) || 60));
       durInput.value = dur;
       socket.emit('set-rapid-mode', { enabled: true, duration: dur });
     });
-    durRow.appendChild(document.createTextNode('Timer: '));
-    durRow.appendChild(durInput);
-    durRow.appendChild(document.createTextNode(' sec'));
-    panel.appendChild(durRow);
+    // Insert before the toggle switch (last child of the row)
+    rapidRow.insertBefore(durInput, rapidRow.lastChild);
   }
+
+  panel.appendChild(rapidRow);
 
   const hr1 = document.createElement('div');
   hr1.className = 'settings-inline-hr';
@@ -518,9 +538,10 @@ function buildSettingsContent() {
   // ── Word Definitions ─────────────────────────────
   panel.appendChild(buildSettingsRow(
     'Word Definitions',
-    'Pathfinders can hover words to see their meaning',
+    inLobby ? 'Pathfinders can hover words to see their meaning' : 'Pathfinders can hover words to see their meaning · Lobby only',
     state.definitionLookup,
-    () => socket.emit('set-definition-mode', { enabled: !state.definitionLookup })
+    () => socket.emit('set-definition-mode', { enabled: !state.definitionLookup }),
+    !inLobby
   ));
 
   const hr2 = document.createElement('div');
@@ -532,7 +553,13 @@ function buildSettingsContent() {
     'Power-ups',
     'Seekers can use Peek and Shield relics during play',
     state.powerupsEnabled !== false,
-    () => socket.emit('set-powerups-mode', { enabled: !(state.powerupsEnabled !== false) })
+    () => {
+      const next = !(state.powerupsEnabled !== false);
+      // Optimistic update: reflect immediately, server confirms
+      if (state) state.powerupsEnabled = next;
+      refreshSettingsOverlayBody();
+      socket.emit('set-powerups-mode', { enabled: next });
+    }
   ));
 
   const hr3 = document.createElement('div');
@@ -544,7 +571,14 @@ function buildSettingsContent() {
     'Color Blind Mode',
     'Replaces red with orange and abyss with teal for clearer distinction',
     !!state.colorBlindMode,
-    () => socket.emit('set-colorblind-mode', { enabled: !state.colorBlindMode })
+    () => {
+      const next = !state.colorBlindMode;
+      // Apply immediately to the page (no round-trip needed for visual effect)
+      document.body.classList.toggle('cb-mode', next);
+      if (state) state.colorBlindMode = next;
+      refreshSettingsOverlayBody();
+      socket.emit('set-colorblind-mode', { enabled: next });
+    }
   ));
 
   return panel;
