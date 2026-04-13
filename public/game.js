@@ -10,6 +10,8 @@ let state = null;
 let peekMode = false;       // client-only: waiting for card click to peek
 let peekResults = {};       // cardId → { color, expires }
 let timerInterval = null;   // setInterval handle for countdown
+let abyssAnimating = false; // delay winner overlay until abyss animation finishes
+const definitionCache = {}; // word → definition string
 
 // ─── DOM refs ────────────────────────────────────────
 const roomCodeDisplay  = document.getElementById('room-code-display');
@@ -70,7 +72,11 @@ socket.on('game-state', (s) => {
 
   if (newFirst && newFirst !== prevFirst) {
     if (newFirst.includes('found the Treasure')) showEventAnim('treasure', s.currentTeam);
-    if (newFirst.includes('The Abyss'))          showEventAnim('abyss',    s.currentTeam);
+    if (newFirst.includes('The Abyss')) {
+      showEventAnim('abyss', s.currentTeam);
+      abyssAnimating = true;
+      setTimeout(() => { abyssAnimating = false; render(); }, 3000);
+    }
   }
 
   render();
@@ -327,6 +333,18 @@ function renderBoard() {
       wordEl.textContent = card.word;
       el.appendChild(wordEl);
 
+      // Definition lookup: pathfinders can hover any unrevealed card
+      if (state.definitionLookup && state.myRole === 'spymaster' && !card.revealed) {
+        el.classList.add('has-definition');
+        el.addEventListener('mouseenter', (e) => {
+          showWordTooltip(card.word, e.clientX, e.clientY);
+        });
+        el.addEventListener('mousemove', (e) => {
+          positionTooltip(document.getElementById('word-tooltip'), e.clientX, e.clientY);
+        });
+        el.addEventListener('mouseleave', hideWordTooltip);
+      }
+
       row.appendChild(el);
     }
 
@@ -407,6 +425,14 @@ function renderLobbyActions() {
   rapidToggle.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> Rapid${state.rapidMode ? ' ON' : ' OFF'}`;
   rapidToggle.addEventListener('click', () => socket.emit('set-rapid-mode', { enabled: !state.rapidMode }));
   wrap.appendChild(rapidToggle);
+
+  // Definition lookup toggle
+  const defToggle = document.createElement('button');
+  defToggle.className = `rapid-toggle${state.definitionLookup ? ' active' : ''}`;
+  defToggle.title = 'Pathfinders can hover over words to see their definitions';
+  defToggle.innerHTML = `<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg> Definitions${state.definitionLookup ? ' ON' : ' OFF'}`;
+  defToggle.addEventListener('click', () => socket.emit('set-definition-mode', { enabled: !state.definitionLookup }));
+  wrap.appendChild(defToggle);
 
   actionBar.appendChild(wrap);
 }
@@ -613,7 +639,7 @@ function renderLog() {
 
 // ─── Winner overlay ──────────────────────────────────
 function renderOverlay() {
-  if (state.phase === 'ended') {
+  if (state.phase === 'ended' && !abyssAnimating) {
     winnerOverlay.style.display = 'flex';
     const scores = state.scores || { red: 0, blue: 0 };
     const scoreStr = `Red: ${scores.red} pts  ·  Blue: ${scores.blue} pts`;
@@ -657,6 +683,59 @@ function showEventAnim(type, team) {
 
   clearTimeout(el._animTimer);
   el._animTimer = setTimeout(() => el.classList.remove('visible'), 5000);
+}
+
+// ─── Definition Lookup ───────────────────────────
+async function fetchDefinition(word) {
+  const key = word.toLowerCase();
+  if (definitionCache[key] !== undefined) return definitionCache[key];
+  try {
+    const res = await fetch(`https://api.dictionaryapi.dev/api/v2/entries/en/${encodeURIComponent(key)}`);
+    if (!res.ok) { definitionCache[key] = null; return null; }
+    const data = await res.json();
+    const entry = data[0];
+    const meaning = entry.meanings[0];
+    const def = meaning.definitions[0];
+    const text = `${meaning.partOfSpeech}: ${def.definition}`;
+    definitionCache[key] = text;
+    return text;
+  } catch {
+    definitionCache[key] = null;
+    return null;
+  }
+}
+
+function showWordTooltip(word, x, y) {
+  const tip = document.getElementById('word-tooltip');
+  if (!tip) return;
+  tip.textContent = 'Loading…';
+  tip.classList.add('visible');
+  positionTooltip(tip, x, y);
+  fetchDefinition(word).then(def => {
+    if (!tip.classList.contains('visible')) return;
+    tip.textContent = def || 'No definition found.';
+    positionTooltip(tip, x, y);
+  });
+}
+
+function hideWordTooltip() {
+  const tip = document.getElementById('word-tooltip');
+  if (tip) tip.classList.remove('visible');
+}
+
+function positionTooltip(tip, x, y) {
+  const margin = 12;
+  tip.style.left = '0';
+  tip.style.top  = '0';
+  const tw = tip.offsetWidth;
+  const th = tip.offsetHeight;
+  let left = x + margin;
+  let top  = y - th / 2;
+  if (left + tw > window.innerWidth - margin) left = x - tw - margin;
+  if (top < margin) top = margin;
+  if (top + th > window.innerHeight - margin) top = window.innerHeight - th - margin;
+  tip.style.left = `${left}px`;
+  tip.style.top  = `${top}px`;
 }
 
 // ─── Theme Toggle ─────────────────────────────────

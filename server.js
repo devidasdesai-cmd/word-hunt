@@ -60,6 +60,7 @@ function createGame(roomCode) {
     },
     rapidMode: false,
     timerEnd: null,
+    definitionLookup: false,
     _timer: null,
   };
 }
@@ -82,6 +83,7 @@ function getPublicState(game, playerId) {
     powerups: game.powerups,
     rapidMode: game.rapidMode,
     timerEnd: game.timerEnd,
+    definitionLookup: game.definitionLookup,
     players: Object.values(game.players).map(p => ({
       id: p.id,
       name: p.name,
@@ -221,6 +223,13 @@ io.on('connection', (socket) => {
     broadcastState(game);
   });
 
+  socket.on('set-definition-mode', ({ enabled }) => {
+    const game = games[currentRoom];
+    if (!game || game.phase !== 'lobby') return;
+    game.definitionLookup = !!enabled;
+    broadcastState(game);
+  });
+
   socket.on('start-game', () => {
     const game = games[currentRoom];
     if (!game) return;
@@ -296,8 +305,8 @@ io.on('connection', (socket) => {
       game.winner = game.currentTeam === 'red' ? 'blue' : 'red';
       game.phase = 'ended';
       clearGameTimer(game);
-      addLog(game, `The Abyss! ${game.winner === 'red' ? 'Red' : 'Blue'} team wins!`);
       addLog(game, `Final scores — Red: ${game.scores.red} | Blue: ${game.scores.blue}`);
+      addLog(game, `The Abyss! ${game.winner === 'red' ? 'Red' : 'Blue'} team wins!`);
       broadcastState(game);
       return;
     }
