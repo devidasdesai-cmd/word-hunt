@@ -1293,9 +1293,9 @@ body.peek-mode .card.peekable:hover {
 /* Tile emoji — subtle icon on treasure/abyss tiles for Pathfinders */
 .card-tile-emoji {
   position: absolute;
-  top: 50%;
+  bottom: 10px;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translateX(-50%);
   font-size: 0.9rem;
   opacity: 0.52;
   pointer-events: none;
