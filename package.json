@@ -1,7 +1,7 @@
 {
-  "name": "word-rush",
+  "name": "word-hunt",
   "version": "1.0.0",
-  "description": "Online Word Rush game",
+  "description": "Online Word Hunt multiplayer game",
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
