@@ -201,6 +201,9 @@ function render() {
   renderLog();
   renderOverlay();
 
+  // Apply/remove colorblind mode class
+  document.body.classList.toggle('cb-mode', !!state.colorBlindMode);
+
   // Keep settings overlay content fresh while it's open
   if (settingsOverlay.style.display !== 'none') refreshSettingsOverlayBody();
 }
@@ -530,6 +533,18 @@ function buildSettingsContent() {
     'Seekers can use Peek and Shield relics during play',
     state.powerupsEnabled !== false,
     () => socket.emit('set-powerups-mode', { enabled: !(state.powerupsEnabled !== false) })
+  ));
+
+  const hr3 = document.createElement('div');
+  hr3.className = 'settings-inline-hr';
+  panel.appendChild(hr3);
+
+  // ── Color Blind Mode ─────────────────────────────
+  panel.appendChild(buildSettingsRow(
+    'Color Blind Mode',
+    'Replaces red with orange and abyss with teal for clearer distinction',
+    !!state.colorBlindMode,
+    () => socket.emit('set-colorblind-mode', { enabled: !state.colorBlindMode })
   ));
 
   return panel;

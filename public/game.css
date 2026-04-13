@@ -1957,4 +1957,115 @@ body.peek-mode .card.peekable:hover {
 [data-theme="light"] .header { background: #ffffff; border-bottom-color: rgba(0,0,0,0.08); }
 [data-theme="light"] .panel { background: #f5f6fb; border-right-color: rgba(0,0,0,0.08); }
 [data-theme="light"] .player-chip { background: #e8ecf5; border-color: rgba(0,0,0,0.08); }
+
+/* ═══════════════════════════════════════════════════
+   COLORBLIND MODE
+   Red  → Orange  (#D55E00 family) — distinct from blue for all types
+   Abyss → Teal   (#009E73 family) — distinct from red, blue, neutral, gold
+   Blue, Neutral, Treasure unchanged — already safe for all common types
+═══════════════════════════════════════════════════ */
+
+/* ── Dark mode ───────────────────────────────────── */
+
+/* Red → Orange */
+body.cb-mode .card.hint-red {
+  background: radial-gradient(circle at 40% 35%, rgba(210,100,0,0.52), rgba(18,5,0,0.97) 80%);
+  border-color: rgba(235,130,20,0.78);
+  box-shadow: inset 0 0 0 6px rgba(210,100,0,0.10), 0 3px 10px rgba(0,0,0,0.55);
+}
+body.cb-mode .card.hint-red .card-word { color: #f0a030; }
+
+body.cb-mode .card.revealed-red {
+  background: radial-gradient(circle at 38% 32%, #b86510, #7a3e00 55%, #3d1c00 100%);
+  box-shadow:
+    inset 0 0 0 5px rgba(220,130,30,0.08),
+    inset 0 1px 0 rgba(255,175,80,0.12),
+    0 3px 16px rgba(180,95,15,0.42),
+    0 1px 4px rgba(0,0,0,0.5);
+  border-color: rgba(200,115,15,0.3) !important;
+}
+body.cb-mode .card.revealed-red .card-word {
+  color: rgba(255,232,205,0.92);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+}
+
+/* Abyss → Teal */
+body.cb-mode .card.hint-abyss {
+  background: radial-gradient(circle at 40% 35%, rgba(0,118,98,0.85), rgba(0,12,10,0.98) 80%);
+  border-color: rgba(0,175,148,0.72);
+  box-shadow:
+    inset 0 0 0 6px rgba(0,140,115,0.13),
+    0 0 10px rgba(0,118,98,0.22),
+    0 3px 10px rgba(0,0,0,0.7);
+}
+body.cb-mode .card.hint-abyss .card-word {
+  color: #65dcc8;
+  text-shadow: 0 0 6px rgba(0,160,135,0.38);
+}
+
+body.cb-mode .card.revealed-abyss {
+  background: radial-gradient(circle at 38% 32%, #006050, #003530 55%, #001410 100%);
+  box-shadow:
+    inset 0 0 0 5px rgba(0,165,135,0.10),
+    inset 0 0 20px rgba(0,130,108,0.16),
+    0 0 16px rgba(0,118,98,0.25),
+    0 3px 12px rgba(0,0,0,0.85);
+  border-color: rgba(0,165,135,0.42) !important;
+}
+body.cb-mode .card.revealed-abyss .card-word {
+  color: #b5f0e5;
+  text-shadow: 0 0 10px rgba(0,160,130,0.38), 0 1px 3px rgba(0,0,0,0.9);
+}
+
+/* Peek mode card interactions in CB mode (teal glow instead of purple) */
+body.cb-mode body.peek-mode .card.peekable:hover {
+  box-shadow: 0 0 0 2.5px rgba(0,165,135,0.7), 0 6px 20px rgba(0,0,0,0.5);
+  border-color: rgba(0,165,135,0.7);
+}
+
+/* Abyss full-screen animation in CB mode */
+body.cb-mode .abyss-bg {
+  background: radial-gradient(ellipse at center,
+    rgba(0,118,98,0.72) 0%,
+    rgba(0,50,42,0.52) 45%,
+    transparent 75%);
+}
+@keyframes abyss-glow-cb {
+  from { text-shadow: 0 0 18px rgba(0,160,130,0.55), 0 0 40px rgba(0,80,65,0.28); }
+  to   { text-shadow: 0 0 32px rgba(0,185,155,0.78), 0 0 65px rgba(0,120,100,0.42); }
+}
+body.cb-mode .abyss-title {
+  animation: event-rise 0.4s ease 0.28s both, abyss-glow-cb 2s ease-in-out 1s infinite alternate;
+}
+
+/* ── Light mode ──────────────────────────────────── */
+
+/* Red → Orange */
+[data-theme="light"] body.cb-mode .card.hint-red {
+  background: radial-gradient(circle at 40% 35%, rgba(210,100,0,0.2), #dde0ee 80%);
+  border-color: rgba(200,95,0,0.68);
+  box-shadow: inset 0 0 0 6px rgba(210,100,0,0.07), 0 2px 8px rgba(0,0,0,0.1);
+}
+[data-theme="light"] body.cb-mode .card.hint-red .card-word { color: #844000; }
+
+[data-theme="light"] body.cb-mode .card.revealed-red {
+  background: radial-gradient(circle at 38% 32%, #c07010, #854800 55%, #4a2400 100%);
+}
+[data-theme="light"] body.cb-mode .card.revealed-red .card-word {
+  color: rgba(255,232,205,0.92);
+  text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+}
+
+/* Abyss → Teal */
+[data-theme="light"] body.cb-mode .card.hint-abyss {
+  background: radial-gradient(circle at 40% 35%, rgba(0,118,98,0.2), #d4e8e4 80%);
+  border-color: rgba(0,145,120,0.72);
+  box-shadow: inset 0 0 0 6px rgba(0,118,98,0.08), 0 2px 8px rgba(0,0,0,0.1);
+}
+[data-theme="light"] body.cb-mode .card.hint-abyss .card-word { color: #005848; }
+
+[data-theme="light"] body.cb-mode .card.revealed-abyss .card-word {
+  color: #b5f0e5;
+  text-shadow: 0 0 8px rgba(0,160,130,0.35), 0 1px 3px rgba(0,0,0,0.9);
+}
 [data-theme="light"] .player-chip.spymaster .role-badge { background: rgba(140,100,14,0.12); color: var(--gold-mid); border-color: rgba(140,100,14,0.25); }

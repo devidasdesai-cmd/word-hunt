@@ -63,6 +63,7 @@ function createGame(roomCode) {
     timerEnd: null,
     definitionLookup: false,
     powerupsEnabled: true,
+    colorBlindMode: false,
     _timer: null,
   };
 }
@@ -88,6 +89,7 @@ function getPublicState(game, playerId) {
     timerEnd: game.timerEnd,
     definitionLookup: game.definitionLookup,
     powerupsEnabled: game.powerupsEnabled,
+    colorBlindMode: game.colorBlindMode,
     players: Object.values(game.players).map(p => ({
       id: p.id,
       name: p.name,
@@ -242,6 +244,13 @@ io.on('connection', (socket) => {
     const game = games[currentRoom];
     if (!game || game.phase !== 'lobby') return;
     game.powerupsEnabled = !!enabled;
+    broadcastState(game);
+  });
+
+  socket.on('set-colorblind-mode', ({ enabled }) => {
+    const game = games[currentRoom];
+    if (!game) return;
+    game.colorBlindMode = !!enabled;
     broadcastState(game);
   });
 
