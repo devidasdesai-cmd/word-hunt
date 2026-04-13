@@ -123,6 +123,9 @@ socket.on('error', ({ message }) => alert(message));
 function cap(s) { return s ? s[0].toUpperCase() + s.slice(1) : ''; }
 function escHtml(s) { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
 
+// Maps internal team identifiers to guild names
+function teamLabel(team) { return team === 'red' ? 'Dawn' : 'Dusk'; }
+
 function roleLabel(role) {
   if (role === 'spymaster') return 'Pathfinder';
   if (role === 'operative') return 'Seeker';
@@ -150,7 +153,7 @@ function renderRoleSelect() {
     const btn = document.createElement('button');
     btn.className = `role-btn ${opt.css}`;
     btn.innerHTML =
-      `<span class="role-btn-team">${cap(opt.team)}</span>` +
+      `<span class="role-btn-team">${teamLabel(opt.team)} Guild</span>` +
       `<span class="role-btn-name">${opt.name}</span>` +
       `<span class="role-btn-desc">${opt.desc}</span>`;
     btn.addEventListener('click', () => {
@@ -181,9 +184,8 @@ function render() {
   // Turn indicator
   if (state.phase !== 'lobby' && state.phase !== 'ended') {
     turnDot.className = `turn-dot ${state.currentTeam}`;
-    const team  = state.currentTeam === 'red' ? 'Red' : 'Blue';
     const phase = state.phase === 'captain-clue' ? 'Pathfinder Charts' : 'On the Hunt';
-    turnText.textContent = `${team} — ${phase}`;
+    turnText.textContent = `${teamLabel(state.currentTeam)} — ${phase}`;
   } else if (state.phase === 'ended') {
     turnDot.className = 'turn-dot';
     turnText.textContent = state.winner === 'tie' ? 'Draw' : 'Game Over';
@@ -231,7 +233,7 @@ function renderHeaderRight() {
     badge.className = 'my-role-bar';
     const teamColor = state.myTeam === 'red' ? 'var(--red-bright)' : 'var(--blue-bright)';
     badge.innerHTML =
-      `<span class="role-bar-team" style="color:${teamColor}">${cap(state.myTeam)}</span>` +
+      `<span class="role-bar-team" style="color:${teamColor}">${teamLabel(state.myTeam)}</span>` +
       `<span class="role-bar-divider">·</span>` +
       `<span class="role-bar-role">${roleLabel(state.myRole)}</span>` +
       `<svg class="role-bar-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>`;
@@ -240,10 +242,10 @@ function renderHeaderRight() {
     dropdown.className = 'role-change-dropdown';
 
     const ROLE_OPTS = [
-      { team: 'red',  role: 'spymaster', label: 'Red Pathfinder',  css: 'red-sp' },
-      { team: 'red',  role: 'operative', label: 'Red Seeker',      css: 'red-op' },
-      { team: 'blue', role: 'spymaster', label: 'Blue Pathfinder', css: 'blue-sp' },
-      { team: 'blue', role: 'operative', label: 'Blue Seeker',     css: 'blue-op' },
+      { team: 'red',  role: 'spymaster', label: 'Dawn Pathfinder', css: 'red-sp' },
+      { team: 'red',  role: 'operative', label: 'Dawn Seeker',     css: 'red-op' },
+      { team: 'blue', role: 'spymaster', label: 'Dusk Pathfinder', css: 'blue-sp' },
+      { team: 'blue', role: 'operative', label: 'Dusk Seeker',     css: 'blue-op' },
     ];
     ROLE_OPTS.forEach(opt => {
       const btn = document.createElement('button');
@@ -368,6 +370,14 @@ function renderBoard() {
           dot.className = 'color-dot';
           dot.style.background = dotColor(card.color);
           el.appendChild(dot);
+
+          // Subtle emoji marker on treasure and abyss tiles for Pathfinders
+          if (state.myRole === 'spymaster' && (card.color === 'treasure' || card.color === 'abyss')) {
+            const emojiEl = document.createElement('div');
+            emojiEl.className = 'card-tile-emoji';
+            emojiEl.textContent = card.color === 'treasure' ? '✨' : '🌀';
+            el.appendChild(emojiEl);
+          }
         }
 
         // Peek result overlay (private to this client)
@@ -448,8 +458,7 @@ function renderActionBar() {
     } else {
       const msg = document.createElement('div');
       msg.className = 'waiting-msg';
-      const team = state.currentTeam === 'red' ? 'Red' : 'Blue';
-      msg.textContent = `Waiting for the ${team} Pathfinder to chart the course…`;
+      msg.textContent = `Waiting for the ${teamLabel(state.currentTeam)} Pathfinder to chart the course…`;
       actionBar.appendChild(msg);
     }
   } else if (state.phase === 'guessing') {
@@ -616,7 +625,7 @@ function renderMidGameJoin() {
   ['red', 'blue'].forEach(team => {
     const btn = document.createElement('button');
     btn.className = `team-pick-btn ${team}-op`;
-    btn.innerHTML = `${cap(team)}<span class="role-label">Seeker</span>`;
+    btn.innerHTML = `${teamLabel(team)} <span class="role-label">Seeker</span>`;
     btn.addEventListener('click', () => socket.emit('set-team', { team, role: 'operative' }));
     wrap.appendChild(btn);
   });
@@ -710,8 +719,7 @@ function renderGuessingBar() {
   } else {
     const waitMsg = document.createElement('span');
     waitMsg.className = 'waiting-msg';
-    const team = state.currentTeam === 'red' ? 'Red' : 'Blue';
-    waitMsg.textContent = `${team} crew is on the hunt…`;
+    waitMsg.textContent = `${teamLabel(state.currentTeam)} Guild is on the hunt…`;
     bar.appendChild(waitMsg);
   }
 
@@ -840,10 +848,9 @@ function showEventAnim(type, team) {
   const sub = document.getElementById(`${type}-anim-sub`);
   if (!el || !sub) return;
 
-  const teamName = team === 'red' ? 'Red' : 'Blue';
   sub.textContent = type === 'treasure'
-    ? `${teamName} crew claims the prize!`
-    : `${teamName} crew falls into the void…`;
+    ? `${teamLabel(team)} Guild claims the prize!`
+    : `${teamLabel(team)} Guild falls into the void…`;
 
   el.classList.remove('visible');
   void el.offsetWidth; // force reflow to restart animation

@@ -152,7 +152,7 @@ function switchTurn(game) {
   game.phase = 'captain-clue';
   game.clue = null;
   game.guessesLeft = 0;
-  addLog(game, `${game.currentTeam === 'red' ? 'Red' : 'Blue'} crew sets out!`);
+  addLog(game, `${game.currentTeam === 'red' ? 'Dawn' : 'Dusk'} Guild sets out!`);
 }
 
 // ─── Socket handlers ──────────────────────────────────
@@ -270,7 +270,7 @@ io.on('connection', (socket) => {
     }
 
     game.phase = 'captain-clue';
-    addLog(game, `The hunt begins! ${game.startTeam === 'red' ? 'Red' : 'Blue'} crew leads the expedition — find your cards and claim the treasure!`);
+    addLog(game, `The hunt begins! ${game.startTeam === 'red' ? 'Dawn' : 'Dusk'} Guild leads the expedition — find your cards and claim the treasure!`);
     broadcastState(game);
   });
 
@@ -329,8 +329,8 @@ io.on('connection', (socket) => {
       game.winner = game.currentTeam === 'red' ? 'blue' : 'red';
       game.phase = 'ended';
       clearGameTimer(game);
-      addLog(game, `Final scores — Red: ${game.scores.red} | Blue: ${game.scores.blue}`);
-      addLog(game, `The Abyss! ${game.winner === 'red' ? 'Red' : 'Blue'} team wins!`);
+      addLog(game, `Final scores — Dawn: ${game.scores.red} | Dusk: ${game.scores.blue}`);
+      addLog(game, `The Abyss! ${game.winner === 'red' ? 'Dawn' : 'Dusk'} Guild wins!`);
       broadcastState(game);
       return;
     }
@@ -339,7 +339,7 @@ io.on('connection', (socket) => {
     if (card.color === 'treasure') {
       game.scores[game.currentTeam]++;
       game.treasureTeam = game.currentTeam;
-      addLog(game, `${player.name} found the Treasure! +1 bonus point for ${game.currentTeam === 'red' ? 'Red' : 'Blue'}!`);
+      addLog(game, `${player.name} found the Treasure! +1 bonus point for ${game.currentTeam === 'red' ? 'Dawn' : 'Dusk'}!`);
       broadcastState(game);
       return; // turn keeps going — do NOT fall through to switchTurn
     }
@@ -356,7 +356,7 @@ io.on('connection', (socket) => {
     game.roundCorrect++;
     if (game.roundCorrect === 3) {
       game.scores[game.currentTeam]++;
-      addLog(game, `3-in-a-row bonus! +1 extra point for ${game.currentTeam === 'red' ? 'Red' : 'Blue'}!`);
+      addLog(game, `3-in-a-row bonus! +1 extra point for ${game.currentTeam === 'red' ? 'Dawn' : 'Dusk'}!`);
     }
 
     // ── Check natural game end (all team cards revealed) ─
@@ -373,9 +373,9 @@ io.on('connection', (socket) => {
       if (winner === 'tie') {
         addLog(game, `Game over — It's a tie! (${red} pts each)`);
       } else {
-        addLog(game, `${winner === 'red' ? 'Red' : 'Blue'} team wins the game!`);
+        addLog(game, `${winner === 'red' ? 'Dawn' : 'Dusk'} Guild wins the game!`);
       }
-      addLog(game, `Final scores — Red: ${red} | Blue: ${blue}`);
+      addLog(game, `Final scores — Dawn: ${red} | Dusk: ${blue}`);
       broadcastState(game);
       return;
     }

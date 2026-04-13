@@ -1290,6 +1290,18 @@ body.peek-mode .card.peekable:hover {
 }
 .card.hint-treasure .card-word { color: #f5cc45; }
 
+/* Tile emoji — subtle icon on treasure/abyss tiles for Pathfinders */
+.card-tile-emoji {
+  position: absolute;
+  bottom: 8px;
+  right: 8px;
+  font-size: 0.72rem;
+  opacity: 0.52;
+  pointer-events: none;
+  line-height: 1;
+  user-select: none;
+}
+
 /* Color dot — small faction indicator */
 .card .color-dot {
   position: absolute;
