@@ -275,10 +275,11 @@ io.on('connection', (socket) => {
     const card = game.cards[cardId];
     if (!card || card.revealed) return;
 
-    const isOwnCard = card.color === game.currentTeam;
+    const isOwnCard  = card.color === game.currentTeam;
+    const isTreasure = card.color === 'treasure';
 
-    // ── Shield check (blocks any non-own card) ────────
-    if (!isOwnCard && game.powerups[game.currentTeam].shieldActive) {
+    // ── Shield check (blocks bad guesses: neutral, opponent, abyss — NOT treasure) ──
+    if (!isOwnCard && !isTreasure && game.powerups[game.currentTeam].shieldActive) {
       game.powerups[game.currentTeam].shield--;
       game.powerups[game.currentTeam].shieldActive = false;
       addLog(game, `Shield activated! "${card.word}" was blocked — guess doesn't count.`);

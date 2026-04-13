@@ -305,7 +305,7 @@ function renderBoard() {
           el.classList.add(`peek-${peek.isSafe ? 'safe' : 'danger'}`);
           const overlay = document.createElement('div');
           overlay.className = 'peek-overlay';
-          overlay.textContent = peek.isSafe ? 'SAFE' : peekColorLabel(peek.color);
+          overlay.textContent = peek.isSafe ? 'SAFE' : 'UNSAFE';
           el.appendChild(overlay);
         }
 
@@ -526,7 +526,8 @@ function renderGuessingBar() {
       peekBtn.addEventListener('click', () => {
         peekMode = !peekMode;
         document.body.classList.toggle('peek-mode', peekMode);
-        renderBoard(); // refresh clickable state
+        renderActionBar(); // immediately update button active state
+        renderBoard();     // refresh card click handlers
       });
       puRow.appendChild(peekBtn);
 
