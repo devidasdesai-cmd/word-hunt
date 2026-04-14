@@ -170,15 +170,21 @@ function renderRoleSelect() {
   ];
 
   OPTIONS.forEach(opt => {
+    const slotTaken = opt.role === 'spymaster' &&
+      state.players.some(p => p.team === opt.team && p.role === 'spymaster');
+
     const btn = document.createElement('button');
-    btn.className = `role-btn ${opt.css}`;
+    btn.className = `role-btn ${opt.css}${slotTaken ? ' role-btn-taken' : ''}`;
+    btn.disabled = slotTaken;
     btn.innerHTML =
       `<span class="role-btn-team">${teamLabel(opt.team)} Guild</span>` +
       `<span class="role-btn-name">${opt.name}</span>` +
-      `<span class="role-btn-desc">${opt.desc}</span>`;
-    btn.addEventListener('click', () => {
-      socket.emit('set-team', { team: opt.team, role: opt.role });
-    });
+      `<span class="role-btn-desc">${slotTaken ? 'Already taken' : opt.desc}</span>`;
+    if (!slotTaken) {
+      btn.addEventListener('click', () => {
+        socket.emit('set-team', { team: opt.team, role: opt.role });
+      });
+    }
     roleGrid.appendChild(btn);
   });
 }
@@ -267,58 +273,14 @@ function renderHeaderRight() {
   headerRight.appendChild(iconGroup);
 
   if (state.myTeam && state.myRole) {
-    const wrap = document.createElement('div');
-    wrap.className = 'role-badge-wrap';
-
     const badge = document.createElement('div');
     badge.className = 'my-role-bar';
     const teamColor = state.myTeam === 'red' ? 'var(--red-bright)' : 'var(--blue-bright)';
     badge.innerHTML =
       `<span class="role-bar-team" style="color:${teamColor}">${teamLabel(state.myTeam)}</span>` +
       `<span class="role-bar-divider">·</span>` +
-      `<span class="role-bar-role">${roleLabel(state.myRole)}</span>` +
-      `<svg class="role-bar-chevron" width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="6 9 12 15 18 9"/></svg>`;
-
-    const dropdown = document.createElement('div');
-    dropdown.className = 'role-change-dropdown';
-
-    const ROLE_OPTS = [
-      { team: 'red',  role: 'spymaster', label: 'Dawn Pathfinder', css: 'red-sp' },
-      { team: 'red',  role: 'operative', label: 'Dawn Seeker',     css: 'red-op' },
-      { team: 'blue', role: 'spymaster', label: 'Dusk Pathfinder', css: 'blue-sp' },
-      { team: 'blue', role: 'operative', label: 'Dusk Seeker',     css: 'blue-op' },
-    ];
-    ROLE_OPTS.forEach(opt => {
-      const btn = document.createElement('button');
-      btn.className = `role-change-option ${opt.css}`;
-      if (state.myTeam === opt.team && state.myRole === opt.role) btn.classList.add('active');
-      btn.textContent = opt.label;
-      btn.addEventListener('click', (e) => {
-        e.stopPropagation();
-        wrap.classList.remove('open');
-        socket.emit('set-team', { team: opt.team, role: opt.role });
-      });
-      dropdown.appendChild(btn);
-    });
-
-    // Click badge to toggle dropdown; click outside to close
-    badge.addEventListener('click', (e) => {
-      e.stopPropagation();
-      const isOpen = wrap.classList.toggle('open');
-      if (isOpen) {
-        function closeDropdown(ev) {
-          if (!wrap.contains(ev.target)) {
-            wrap.classList.remove('open');
-            document.removeEventListener('click', closeDropdown);
-          }
-        }
-        document.addEventListener('click', closeDropdown);
-      }
-    });
-
-    wrap.appendChild(badge);
-    wrap.appendChild(dropdown);
-    headerRight.appendChild(wrap);
+      `<span class="role-bar-role">${roleLabel(state.myRole)}</span>`;
+    headerRight.appendChild(badge);
   }
 
   if (isCaptain && inGame) {

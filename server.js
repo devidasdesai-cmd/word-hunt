@@ -212,10 +212,22 @@ io.on('connection', (socket) => {
     if (!game || !game.players[currentPlayerId]) return;
 
     const player = game.players[currentPlayerId];
-    if (game.phase !== 'lobby') {
-      // Mid-game: only unassigned players can join, and only as scouts
-      if (player.team !== null) return;
-      if (role !== 'operative') return;
+
+    // Role is locked once chosen — no switching allowed
+    if (player.team !== null) return;
+
+    // Mid-game late joiners can only join as Seekers
+    if (game.phase !== 'lobby' && role !== 'operative') return;
+
+    // Only one Pathfinder per guild
+    if (role === 'spymaster') {
+      const slotTaken = Object.values(game.players).some(
+        p => p.id !== currentPlayerId && p.team === team && p.role === 'spymaster'
+      );
+      if (slotTaken) {
+        socket.emit('error', { message: `${team === 'red' ? 'Dawn' : 'Dusk'} Guild already has a Pathfinder.` });
+        return;
+      }
     }
 
     player.team = team;

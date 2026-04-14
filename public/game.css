@@ -1607,6 +1607,14 @@ body.peek-mode .card.peekable:hover {
 .role-btn-blue-op .role-btn-team { color: rgba(36,113,163,0.72); }
 .role-btn-blue-op:hover { border-color: var(--blue-border); background: rgba(27,74,122,0.1); }
 
+/* Taken Pathfinder slot — greyed out, not clickable */
+.role-btn.role-btn-taken {
+  opacity: 0.38;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+.role-btn.role-btn-taken:hover { transform: none; box-shadow: none; }
+
 /* ═══════════════════════════════════════════════════
    WORD DEFINITION TOOLTIP
 ═══════════════════════════════════════════════════ */
