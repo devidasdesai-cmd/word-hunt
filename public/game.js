@@ -745,17 +745,7 @@ function renderGuessingBar() {
     bar.appendChild(clueDisp);
   }
 
-  if (isMyTurn) {
-    const endBtn = document.createElement('button');
-    endBtn.className = 'end-turn-btn';
-    endBtn.textContent = 'Take a Nap';
-    endBtn.addEventListener('click', () => socket.emit('end-turn'));
-    bar.appendChild(endBtn);
-  }
-
-  actionBar.appendChild(bar);
-
-  // ── Relic cards — only when it's the seeker's turn and power-ups are on ──
+  // ── Relics + end-turn in one unified row ──
   if (isMyTurn && pu && puEnabled) {
     const relicRow = document.createElement('div');
     relicRow.className = 'relic-row';
@@ -764,13 +754,13 @@ function renderGuessingBar() {
     const peekSpent = pu.peek <= 0;
     const peekCard  = document.createElement('div');
     peekCard.className = `relic-card relic-peek${peekMode ? ' relic-active' : ''}${peekSpent ? ' relic-spent' : ''}`;
+    peekCard.title = 'Reveal a tile\'s nature before committing';
     peekCard.innerHTML = `
       <div class="relic-icon">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
       </div>
-      <div class="relic-name">Peek</div>
-      <div class="relic-hint">Reveal a tile's nature before committing</div>
-      <div class="relic-status">${peekSpent ? 'Spent' : peekMode ? 'Active — pick a tile' : 'Available'}</div>`;
+      <span class="relic-name">Peek</span>
+      <span class="relic-status">${peekSpent ? 'Spent' : peekMode ? 'Active' : 'Use'}</span>`;
     if (!peekSpent) {
       peekCard.addEventListener('click', () => {
         peekMode = !peekMode;
@@ -782,23 +772,33 @@ function renderGuessingBar() {
     relicRow.appendChild(peekCard);
 
     // Shield relic
-    const shieldSpent  = pu.shield <= 0 && !pu.shieldActive;
-    const shieldCard   = document.createElement('div');
+    const shieldSpent = pu.shield <= 0 && !pu.shieldActive;
+    const shieldCard  = document.createElement('div');
     shieldCard.className = `relic-card relic-shield${pu.shieldActive ? ' relic-active' : ''}${shieldSpent ? ' relic-spent' : ''}`;
+    shieldCard.title = 'Block one bad guess from costing a turn';
     shieldCard.innerHTML = `
       <div class="relic-icon">
-        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+        <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
       </div>
-      <div class="relic-name">Shield</div>
-      <div class="relic-hint">Block one bad guess from costing a turn</div>
-      <div class="relic-status">${shieldSpent ? 'Spent' : pu.shieldActive ? 'Active — guarding you' : 'Available'}</div>`;
+      <span class="relic-name">Shield</span>
+      <span class="relic-status">${shieldSpent ? 'Spent' : pu.shieldActive ? 'Active' : 'Use'}</span>`;
     if (!shieldSpent) {
       shieldCard.addEventListener('click', () => socket.emit('activate-shield'));
     }
     relicRow.appendChild(shieldCard);
 
-    actionBar.appendChild(relicRow);
+    bar.appendChild(relicRow);
   }
+
+  if (isMyTurn) {
+    const endBtn = document.createElement('button');
+    endBtn.className = 'end-turn-btn';
+    endBtn.textContent = 'Take a Nap';
+    endBtn.addEventListener('click', () => socket.emit('end-turn'));
+    bar.appendChild(endBtn);
+  }
+
+  actionBar.appendChild(bar);
 }
 
 // ─── Timer ───────────────────────────────────────────
