@@ -405,6 +405,43 @@
       line-height: 1.5;
     }
 
+    /* ── Score list ── */
+    .score-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin-top: 0.25rem;
+    }
+    .score-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 10px;
+      padding: 0.65rem 0.9rem;
+    }
+    .score-value {
+      font-size: 1.1rem;
+      font-weight: 800;
+      min-width: 2.5rem;
+      text-align: center;
+      flex-shrink: 0;
+      font-variant-numeric: tabular-nums;
+      letter-spacing: -0.01em;
+    }
+    .score-row.positive .score-value { color: #4ec97a; }
+    .score-row.negative .score-value { color: #e05046; }
+    .score-row.neutral-row .score-value { color: var(--text-muted); }
+    .score-label {
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      line-height: 1.45;
+    }
+    [data-theme="light"] .score-row { background: #f0f2f8; border-color: rgba(0,0,0,0.1); }
+    [data-theme="light"] .score-row.positive .score-value { color: #1a7a40; }
+    [data-theme="light"] .score-row.negative .score-value { color: #b52b20; }
+
     /* ── Tips ── */
     .tips-list {
       display: flex;
@@ -518,7 +555,7 @@
     <!-- Roles -->
     <div class="section">
       <div class="section-title">Roles</div>
-      <p>Every player picks a guild and a role before the game starts. You can switch at any time from the lobby.</p>
+      <p>Every player picks a guild and a role before the game starts. Your role is <strong>locked once chosen</strong> and cannot be changed — choose carefully. Each guild can have only one Pathfinder, so if that slot is taken you must join as a Seeker.</p>
       <div class="role-grid">
         <div class="role-card">
           <div class="role-card-team dawn">Dawn Guild</div>
@@ -572,7 +609,7 @@
           </div>
           <div>
             <div class="tile-info-name">Neutral Tiles</div>
-            <div class="tile-info-desc">Belong to neither team. Revealing one simply ends your turn — no points scored, no penalty.</div>
+            <div class="tile-info-desc">Belong to neither team. Revealing one costs your team 0.5 points and ends your turn immediately. Treat them like landmines — only guess when you're confident.</div>
           </div>
         </div>
         <div class="tile-row">
@@ -615,7 +652,7 @@
           <div class="step-num">2</div>
           <div class="step-body">
             <div class="step-title">Seekers Hunt</div>
-            <div class="step-desc">The Seekers discuss and tap tiles on the board. You may guess up to the clue number plus one bonus guess. Each correct guess (your own team's tile) reveals the tile and you can keep going. A wrong guess — neutral, opponent's tile, or worse — ends the guessing phase immediately (unless a Shield is active).</div>
+            <div class="step-desc">The Seekers discuss and tap tiles on the board. Each correct guess (your own team's tile) scores a point and lets you keep going. A wrong guess — a Neutral or the opponent's tile — deducts 0.5 pts from your team and ends your turn immediately. The Shield relic fully absorbs one wrong guess: the tile is not revealed, no points are deducted, and guessing continues.</div>
           </div>
         </div>
         <div class="step">
@@ -638,10 +675,40 @@
     <!-- Winning -->
     <div class="section">
       <div class="section-title">Winning the Game</div>
-      <p>A team wins by revealing all of their assigned tiles first. But there are two shortcuts:</p>
-      <p><strong>Treasure:</strong> Revealing the Treasure tile earns your team a bonus point and your turn keeps going. It can also break a tie — if both teams finish level on points, the team that found the Treasure wins.</p>
-      <p><strong>Abyss:</strong> Revealing the Abyss tile ends the game instantly — the opposing team wins, no matter the score. It is an immediate, total loss for the team that uncovers it.</p>
-      <p>The header always shows the current score and whose turn it is, so everyone stays in the loop at a glance.</p>
+      <p>The team with the most points when the game ends wins. The game ends in one of three ways:</p>
+      <p><strong>All tiles revealed:</strong> When a team reveals their last tile, the game does not end immediately. The opposing team gets <strong>one final turn</strong> to respond — their Pathfinder gives a clue, their Seekers hunt, and the game ends after that turn regardless of the outcome. The header will show "Final Turn" so everyone knows what's at stake.</p>
+      <p><strong>Treasure:</strong> Revealing the Treasure tile earns a bonus point and your turn continues. If scores are level at the end, the team that found the Treasure wins the tiebreaker.</p>
+      <p><strong>Abyss:</strong> Revealing the Abyss tile ends the game instantly — the opposing team wins regardless of score. There is no final turn. Tread carefully.</p>
+      <p>The header always shows the live score and whose turn it is. After the game, the result screen shows the final scores and the reason the winning team won.</p>
+    </div>
+
+    <!-- Scoring -->
+    <div class="section">
+      <div class="section-title">Scoring</div>
+      <p>Every guess matters. Points accumulate throughout the game — margins can be slim, so precision counts as much as speed.</p>
+      <div class="score-list">
+        <div class="score-row positive">
+          <div class="score-value">+1</div>
+          <div class="score-label">Reveal one of your own team's tiles</div>
+        </div>
+        <div class="score-row positive">
+          <div class="score-value">+1</div>
+          <div class="score-label">3-in-a-row bonus — reveal 3 of your own tiles in a single turn (stacks with the normal +1 per tile)</div>
+        </div>
+        <div class="score-row positive">
+          <div class="score-value">+1</div>
+          <div class="score-label">Reveal the Treasure tile — your turn continues after claiming it</div>
+        </div>
+        <div class="score-row negative">
+          <div class="score-value">−½</div>
+          <div class="score-label">Reveal a Neutral tile or the opponent's tile — turn ends immediately</div>
+        </div>
+        <div class="score-row neutral-row">
+          <div class="score-value">—</div>
+          <div class="score-label">Reveal the Abyss tile — game ends instantly, the opposing team wins regardless of score</div>
+        </div>
+      </div>
+      <p style="margin-top:0.9rem;">Scores can go negative if a team makes enough wrong guesses. The Shield relic fully blocks a bad guess — no reveal, no deduction, guessing continues.</p>
     </div>
 
     <!-- Power-ups -->
@@ -692,10 +759,12 @@
       <div class="tips-list">
         <div class="tip"><span class="tip-bullet">◆</span><span>As a Pathfinder, think about which of your tiles share something in common — a category, a shape, a feeling — that doesn't accidentally point to the Abyss or the opponent's tiles.</span></div>
         <div class="tip"><span class="tip-bullet">◆</span><span>A clue count of 0 is legal — it signals "unlimited guesses" and works best when you have confidence in your Seekers and want to let them catch up on old clues.</span></div>
-        <div class="tip"><span class="tip-bullet">◆</span><span>As a Seeker, always guess your most confident tile first. If it turns out to be wrong, the Shield relic can save the turn. Save the Shield for when the stakes are highest.</span></div>
-        <div class="tip"><span class="tip-bullet">◆</span><span>Use Peek on tiles you strongly suspect are yours but aren't 100% sure about. It confirms or denies before you commit — spending one use of Peek is almost always better than handing a point to the enemy.</span></div>
-        <div class="tip"><span class="tip-bullet">◆</span><span>Don't be afraid to Take a Nap early. Stopping after two correct guesses is often smarter than risking a third uncertain one.</span></div>
-        <div class="tip"><span class="tip-bullet">◆</span><span>The Treasure tile gives a bonus point and keeps your turn going — worth hunting for, especially in a close game. The Abyss tile ends the game immediately in the opponent's favor, so when a clue feels uncertain, think twice before guessing.</span></div>
+        <div class="tip"><span class="tip-bullet">◆</span><span>Wrong guesses now cost 0.5 pts — a guess that feels only 60% certain can easily hurt more than it helps. "Take a Nap" is always a valid move.</span></div>
+        <div class="tip"><span class="tip-bullet">◆</span><span>Save the Shield for your riskiest guess, not your first one. It fully absorbs a bad guess — no reveal, no −0.5 pts, guessing continues — so timing it well can be the difference between a 1-point swing and a 1.5-point swing.</span></div>
+        <div class="tip"><span class="tip-bullet">◆</span><span>Use Peek on a tile you're 70% sure about, not 95% sure. At 95% confidence just guess it. At 70% the Peek is worth spending to avoid the −0.5 penalty and lost turn.</span></div>
+        <div class="tip"><span class="tip-bullet">◆</span><span>When your team is about to reveal their last tile, think about what clue the opposing team might give during their final turn. If they're likely to score big, consider whether to trigger the final turn now or keep guessing for more points first.</span></div>
+        <div class="tip"><span class="tip-bullet">◆</span><span>The Treasure tile gives +1 and keeps your turn going — it's worth chasing, especially when scores are close. The Abyss ends the game instantly with no final turn, so near the endgame treat any uncertain tile as a potential Abyss.</span></div>
+        <div class="tip"><span class="tip-bullet">◆</span><span>As a Pathfinder, think about which of your tiles share something in common that doesn't accidentally point toward Neutral tiles, the opponent's tiles, or the Abyss. A clue that gets 2 safe tiles is better than one that risks a −0.5 trying for 3.</span></div>
         <div class="tip"><span class="tip-bullet">◆</span><span>Share the room code or invite link with friends so they can join directly. The more hunters, the more lively the debate.</span></div>
       </div>
     </div>
