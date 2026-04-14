@@ -1280,15 +1280,15 @@ body.peek-mode .card.peekable:hover {
 
 /* TREASURE — vivid amber-gold. Clearly warm yellow vs neutral's cool grey. */
 .card.hint-treasure {
-  background: radial-gradient(circle at 40% 35%, rgba(210,162,30,0.52), rgba(12,9,2,0.97) 80%);
-  border-color: rgba(238,185,45,0.82);
+  background: radial-gradient(circle at 40% 35%, rgba(230,175,20,0.82), rgba(12,9,2,0.97) 80%);
+  border-color: rgba(255,200,40,0.95);
   box-shadow:
-    inset 0 0 0 6px rgba(225,175,40,0.12),
-    inset 0 1px 0 rgba(255,220,80,0.07),
-    0 0 12px rgba(200,155,20,0.18),
+    inset 0 0 0 6px rgba(240,190,40,0.22),
+    inset 0 1px 0 rgba(255,230,100,0.12),
+    0 0 18px rgba(220,170,10,0.40),
     0 3px 10px rgba(0,0,0,0.55);
 }
-.card.hint-treasure .card-word { color: #f5cc45; }
+.card.hint-treasure .card-word { color: #ffe050; text-shadow: 0 0 8px rgba(255,200,30,0.55); }
 
 /* Tile emoji — subtle icon on treasure/abyss tiles for Pathfinders */
 .card-tile-emoji {
@@ -1377,18 +1377,18 @@ body.peek-mode .card.peekable:hover {
 
 /* Treasure: antique gold */
 .card.revealed-treasure {
-  background: radial-gradient(circle at 38% 32%, #d4a030, #8a6010 55%, #4a3200 100%);
+  background: radial-gradient(circle at 38% 32%, #e8b020, #a07010 55%, #4a3200 100%);
   box-shadow:
-    inset 0 0 0 5px rgba(255,220,120,0.1),
-    inset 0 1px 0 rgba(255,230,140,0.18),
-    0 3px 20px rgba(184,146,58,0.45),
+    inset 0 0 0 5px rgba(255,220,120,0.18),
+    inset 0 1px 0 rgba(255,235,140,0.25),
+    0 3px 24px rgba(220,170,20,0.65),
     0 1px 4px rgba(0,0,0,0.5);
-  border-color: rgba(184,146,58,0.45) !important;
+  border-color: rgba(240,190,30,0.70) !important;
 }
 .card.revealed-treasure .card-word {
-  color: rgba(20,10,0,0.85);
+  color: rgba(20,10,0,0.90);
   font-weight: 800;
-  text-shadow: 0 1px 2px rgba(255,200,60,0.2);
+  text-shadow: 0 1px 2px rgba(255,210,60,0.35);
 }
 
 /* ── Clickable (Seeker hover/press) ─────────────────── */
@@ -1934,11 +1934,11 @@ body.peek-mode .card.peekable:hover {
 [data-theme="light"] .card.hint-abyss .card-word { color: #330870; }
 
 [data-theme="light"] .card.hint-treasure {
-  background: radial-gradient(circle at 40% 35%, rgba(195,148,12,0.24), #dde0ee 80%);
-  border-color: rgba(185,138,8,0.68);
-  box-shadow: inset 0 0 0 6px rgba(195,148,12,0.09), 0 2px 8px rgba(0,0,0,0.1);
+  background: radial-gradient(circle at 40% 35%, rgba(210,158,0,0.52), #dde0ee 80%);
+  border-color: rgba(195,145,0,0.88);
+  box-shadow: inset 0 0 0 6px rgba(210,158,0,0.14), 0 0 12px rgba(200,150,0,0.22), 0 2px 8px rgba(0,0,0,0.1);
 }
-[data-theme="light"] .card.hint-treasure .card-word { color: #7a4e00; }
+[data-theme="light"] .card.hint-treasure .card-word { color: #6b3d00; font-weight: 700; text-shadow: none; }
 
 /* Revealed abyss in light mode: background is near-black indigo — keep text light */
 [data-theme="light"] .card.revealed-abyss .card-word {
@@ -2120,7 +2120,37 @@ body.cb-mode .card.revealed-red .card-word {
   text-shadow: 0 1px 4px rgba(0,0,0,0.6);
 }
 
-/* Abyss → Teal */
+/* Treasure → vivid yellow-gold (safe for all colorblind types) */
+body.cb-mode .card.hint-treasure {
+  background: radial-gradient(circle at 40% 35%, rgba(245,190,0,0.90), rgba(12,9,2,0.97) 80%);
+  border-color: rgba(255,210,0,1.0);
+  box-shadow:
+    inset 0 0 0 6px rgba(255,210,0,0.22),
+    inset 0 1px 0 rgba(255,240,120,0.14),
+    0 0 22px rgba(240,190,0,0.55),
+    0 3px 10px rgba(0,0,0,0.55);
+}
+body.cb-mode .card.hint-treasure .card-word {
+  color: #ffee55;
+  text-shadow: 0 0 10px rgba(255,220,0,0.65);
+}
+
+body.cb-mode .card.revealed-treasure {
+  background: radial-gradient(circle at 38% 32%, #f0b800, #b08000 55%, #5a4000 100%);
+  box-shadow:
+    inset 0 0 0 5px rgba(255,230,60,0.20),
+    inset 0 1px 0 rgba(255,245,150,0.28),
+    0 3px 28px rgba(240,185,0,0.72),
+    0 1px 4px rgba(0,0,0,0.5);
+  border-color: rgba(255,210,0,0.80) !important;
+}
+body.cb-mode .card.revealed-treasure .card-word {
+  color: rgba(20,12,0,0.92);
+  font-weight: 800;
+  text-shadow: 0 1px 2px rgba(255,220,0,0.4);
+}
+
+/* Abyss → Indigo */
 body.cb-mode .card.hint-abyss {
   background: radial-gradient(circle at 40% 35%, rgba(72,30,200,0.88), rgba(6,2,20,0.98) 80%);
   border-color: rgba(110,70,230,0.72);
@@ -2185,6 +2215,17 @@ body.cb-mode .abyss-title {
 [data-theme="light"] body.cb-mode .card.revealed-red .card-word {
   color: rgba(255,232,205,0.92);
   text-shadow: 0 1px 4px rgba(0,0,0,0.6);
+}
+
+/* Treasure → vivid yellow-gold in light CB */
+[data-theme="light"] body.cb-mode .card.hint-treasure {
+  background: radial-gradient(circle at 40% 35%, rgba(230,170,0,0.60), #dde0ee 80%);
+  border-color: rgba(210,155,0,0.95);
+  box-shadow: inset 0 0 0 6px rgba(230,170,0,0.16), 0 0 14px rgba(220,165,0,0.32), 0 2px 8px rgba(0,0,0,0.1);
+}
+[data-theme="light"] body.cb-mode .card.hint-treasure .card-word {
+  color: #5a3000;
+  font-weight: 700;
 }
 
 /* Abyss → Indigo */
