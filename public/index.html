@@ -237,12 +237,20 @@
     /* ── Footer ── */
     .footer {
       text-align: center;
-      font-size: 0.68rem;
-      font-style: italic;
+      font-size: 0.72rem;
       color: var(--text-muted);
-      opacity: 0.55;
-      letter-spacing: 0.07em;
     }
+
+    .how-to-play-link {
+      color: var(--text-muted);
+      text-decoration: none;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      font-weight: 600;
+      font-size: 0.68rem;
+      transition: color 0.18s;
+    }
+    .how-to-play-link:hover { color: var(--gold-bright); }
 
     /* ── Theme Toggle ── */
     .theme-toggle {
@@ -373,6 +381,8 @@
       </div>
 
     </div>
+
+    <p class="footer"><a href="/how-to-play.html" class="how-to-play-link">How to Play</a></p>
 
   </div>
 

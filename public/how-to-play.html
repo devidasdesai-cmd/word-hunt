@@ -1,0 +1,602 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>How to Play — Word Hunt</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;900&display=swap" rel="stylesheet" />
+  <script>(function(){var t=localStorage.getItem('wordhunt-theme')||'dark';document.documentElement.setAttribute('data-theme',t);})();</script>
+  <style>
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    :root {
+      --bg:        #07080e;
+      --surface:   #0c0e1b;
+      --surface2:  #11142a;
+      --border:    rgba(255,255,255,0.055);
+      --border2:   rgba(255,255,255,0.1);
+      --border-gold: rgba(184,146,58,0.3);
+      --text:      #dde0ec;
+      --text-muted:#505570;
+      --text-dim:  #828aac;
+      --gold:      #b8923a;
+      --gold-bright: #e2c46a;
+      --dawn:      #c0392b;
+      --dusk:      #2980b9;
+    }
+
+    html, body { min-height: 100%; }
+
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      padding: 2.5rem 1.5rem 4rem;
+    }
+
+    body::before {
+      content: '';
+      position: fixed;
+      inset: 0;
+      background: radial-gradient(ellipse at 50% 0%, rgba(27,74,122,0.07) 0%, transparent 60%),
+                  radial-gradient(ellipse at 80% 100%, rgba(154,34,50,0.05) 0%, transparent 55%);
+      pointer-events: none;
+    }
+
+    /* ── Layout ── */
+    .page {
+      position: relative;
+      max-width: 680px;
+      margin: 0 auto;
+    }
+
+    /* ── Back link ── */
+    .back-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.45rem;
+      font-size: 0.75rem;
+      font-weight: 600;
+      letter-spacing: 0.1em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      text-decoration: none;
+      margin-bottom: 2.5rem;
+      transition: color 0.18s;
+    }
+    .back-link:hover { color: var(--gold-bright); }
+    .back-link svg { flex-shrink: 0; }
+
+    /* ── Brand header ── */
+    .brand {
+      text-align: center;
+      margin-bottom: 2.5rem;
+    }
+    .brand h1 {
+      font-size: 2.8rem;
+      letter-spacing: 0.04em;
+      line-height: 1;
+      background: linear-gradient(135deg, var(--gold-bright) 0%, var(--gold) 50%, var(--gold-bright) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+      margin-bottom: 0.4rem;
+    }
+    .brand .sub {
+      font-size: 0.72rem;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--text-muted);
+      font-style: italic;
+    }
+
+    /* ── Sections ── */
+    .section {
+      background: var(--surface);
+      border: 1px solid var(--border-gold);
+      border-radius: 16px;
+      padding: 1.75rem 2rem;
+      margin-bottom: 1.25rem;
+      box-shadow: 0 4px 24px rgba(0,0,0,0.3);
+    }
+
+    .section-title {
+      font-size: 0.65rem;
+      font-weight: 700;
+      letter-spacing: 0.2em;
+      text-transform: uppercase;
+      color: var(--gold);
+      margin-bottom: 1.1rem;
+    }
+
+    h2 {
+      font-size: 1.15rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.6rem;
+      letter-spacing: 0.01em;
+    }
+
+    p {
+      font-size: 0.88rem;
+      line-height: 1.65;
+      color: var(--text-dim);
+      margin-bottom: 0.75rem;
+    }
+    p:last-child { margin-bottom: 0; }
+
+    /* ── Role cards grid ── */
+    .role-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-top: 0.25rem;
+    }
+
+    .role-card {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 1rem 1.1rem;
+    }
+    .role-card-team {
+      font-size: 0.6rem;
+      font-weight: 700;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+    .role-card-name {
+      font-size: 1rem;
+      font-weight: 700;
+      margin-bottom: 0.35rem;
+    }
+    .role-card-desc {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+    .dawn { color: #e05046; }
+    .dusk { color: #4a9fd4; }
+
+    /* ── Tile legend ── */
+    .tile-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-top: 0.25rem;
+    }
+
+    .tile-row {
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .tile-swatch {
+      width: 42px;
+      height: 42px;
+      border-radius: 9px;
+      flex-shrink: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.15rem;
+      font-weight: 700;
+    }
+    .swatch-dawn     { background: rgba(192,57,43,0.25); border: 1px solid rgba(192,57,43,0.45); color: #e05046; }
+    .swatch-dusk     { background: rgba(41,128,185,0.2); border: 1px solid rgba(41,128,185,0.4); color: #4a9fd4; }
+    .swatch-neutral  { background: #1a1d2e; border: 1px solid rgba(255,255,255,0.12); color: #6b7299; }
+    .swatch-treasure { background: rgba(184,146,58,0.25); border: 1px solid rgba(184,146,58,0.5); }
+    .swatch-abyss    { background: rgba(30,8,60,0.7); border: 1px solid rgba(100,40,180,0.4); }
+
+    .tile-info-name {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: var(--text);
+      margin-bottom: 0.15rem;
+    }
+    .tile-info-desc {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      line-height: 1.45;
+    }
+
+    /* ── Steps ── */
+    .steps {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      margin-top: 0.25rem;
+    }
+
+    .step {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-start;
+    }
+
+    .step-num {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(184,146,58,0.15);
+      border: 1px solid var(--border-gold);
+      color: var(--gold-bright);
+      font-size: 0.72rem;
+      font-weight: 700;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      margin-top: 0.05rem;
+    }
+
+    .step-body { flex: 1; }
+    .step-title {
+      font-size: 0.88rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.25rem;
+    }
+    .step-desc {
+      font-size: 0.8rem;
+      color: var(--text-dim);
+      line-height: 1.55;
+    }
+
+    /* ── Power-up cards ── */
+    .powerup-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.75rem;
+      margin-top: 0.25rem;
+    }
+
+    .powerup-card {
+      background: var(--surface2);
+      border: 1px solid var(--border2);
+      border-radius: 12px;
+      padding: 1rem 1.1rem;
+    }
+    .powerup-icon {
+      font-size: 1.4rem;
+      margin-bottom: 0.4rem;
+    }
+    .powerup-name {
+      font-size: 0.9rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.3rem;
+    }
+    .powerup-desc {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+
+    /* ── Settings list ── */
+    .settings-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.85rem;
+      margin-top: 0.25rem;
+    }
+    .setting-item {}
+    .setting-name {
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text);
+      margin-bottom: 0.18rem;
+    }
+    .setting-desc {
+      font-size: 0.78rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+
+    /* ── Tips ── */
+    .tips-list {
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      margin-top: 0.25rem;
+    }
+    .tip {
+      display: flex;
+      gap: 0.75rem;
+      align-items: flex-start;
+      font-size: 0.82rem;
+      color: var(--text-dim);
+      line-height: 1.5;
+    }
+    .tip-bullet {
+      color: var(--gold);
+      flex-shrink: 0;
+      font-size: 0.75rem;
+      margin-top: 0.1rem;
+    }
+
+    /* ── Theme toggle ── */
+    .theme-toggle {
+      position: fixed;
+      top: 1rem;
+      right: 1.25rem;
+      width: 34px;
+      height: 34px;
+      border-radius: 50%;
+      border: 1px solid var(--border2);
+      background: var(--surface2);
+      color: var(--text-dim);
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+      z-index: 10;
+      transition: color 0.2s, border-color 0.2s;
+    }
+    .theme-toggle:hover { color: var(--gold-bright); border-color: var(--border-gold); }
+
+    /* ── Mobile ── */
+    @media (max-width: 520px) {
+      body { padding: 2rem 1rem 3rem; }
+      .brand h1 { font-size: 2.2rem; }
+      .section { padding: 1.4rem 1.25rem; }
+      .role-grid { grid-template-columns: 1fr; }
+      .powerup-grid { grid-template-columns: 1fr; }
+    }
+
+    /* ── Light Mode ── */
+    [data-theme="light"] {
+      --bg:        #f0f2f8;
+      --surface:   #ffffff;
+      --surface2:  #e8ecf5;
+      --border:    rgba(0,0,0,0.08);
+      --border2:   rgba(0,0,0,0.14);
+      --border-gold: rgba(150,110,20,0.4);
+      --text:      #0c0d18;
+      --text-muted:#3c4268;
+      --text-dim:  #404570;
+      --gold:      #7a5c0e;
+      --gold-bright:#a07820;
+    }
+    [data-theme="light"] .section {
+      box-shadow: 0 4px 20px rgba(0,0,0,0.09);
+      border-color: rgba(0,0,0,0.1);
+    }
+    [data-theme="light"] .role-card,
+    [data-theme="light"] .powerup-card {
+      background: #f0f2f8;
+      border-color: rgba(0,0,0,0.1);
+    }
+    [data-theme="light"] .swatch-neutral {
+      background: #dde0ee;
+      border-color: rgba(0,0,0,0.15);
+      color: #6b7299;
+    }
+    [data-theme="light"] .dawn { color: #b52b20; }
+    [data-theme="light"] .dusk { color: #1a6fa0; }
+    [data-theme="light"] .swatch-dawn    { background: rgba(192,57,43,0.12); border-color: rgba(192,57,43,0.3); color: #b52b20; }
+    [data-theme="light"] .swatch-dusk    { background: rgba(41,128,185,0.12); border-color: rgba(41,128,185,0.3); color: #1a6fa0; }
+    [data-theme="light"] .swatch-abyss   { background: #d8d0f0; border-color: rgba(80,50,160,0.3); }
+  </style>
+</head>
+<body>
+
+  <button class="theme-toggle" id="theme-toggle" title="Toggle dark/light mode" aria-label="Toggle theme"></button>
+
+  <div class="page">
+
+    <a class="back-link" href="/">
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+      Back to Home
+    </a>
+
+    <div class="brand">
+      <h1>How to Play</h1>
+      <p class="sub">Word Hunt — complete guide</p>
+    </div>
+
+    <!-- Overview -->
+    <div class="section">
+      <div class="section-title">The Goal</div>
+      <p>Word Hunt is a two-team word-guessing game. The <strong>Dawn Guild</strong> and the <strong>Dusk Guild</strong> compete to be the first team to reveal all of their own tiles on the board. Every game features a 19-tile board arranged in a hexagonal pattern — and not all tiles belong to you.</p>
+      <p>One team's Pathfinder knows exactly which tiles belong to whom. Their job is to guide their Seekers toward the right tiles using nothing but a single word and a number. The Seekers do the rest.</p>
+    </div>
+
+    <!-- Roles -->
+    <div class="section">
+      <div class="section-title">Roles</div>
+      <p>Every player picks a guild and a role before the game starts. You can switch at any time from the lobby.</p>
+      <div class="role-grid">
+        <div class="role-card">
+          <div class="role-card-team dawn">Dawn Guild</div>
+          <div class="role-card-name">Pathfinder</div>
+          <div class="role-card-desc">Sees the full treasure map — which tiles belong to Dawn, Dusk, Treasure, Abyss, or neither. Gives clues to guide the Seekers. Cannot touch the board.</div>
+        </div>
+        <div class="role-card">
+          <div class="role-card-team dusk">Dusk Guild</div>
+          <div class="role-card-name">Pathfinder</div>
+          <div class="role-card-desc">Same as Dawn's Pathfinder — sees all tile identities and charts the expedition with one-word clues.</div>
+        </div>
+        <div class="role-card">
+          <div class="role-card-team dawn">Dawn Guild</div>
+          <div class="role-card-name">Seeker</div>
+          <div class="role-card-desc">Hunts for the team's tiles based on the Pathfinder's clue. Taps tiles on the board to reveal them. Can use power-ups (if enabled).</div>
+        </div>
+        <div class="role-card">
+          <div class="role-card-team dusk">Dusk Guild</div>
+          <div class="role-card-name">Seeker</div>
+          <div class="role-card-desc">Same as Dawn's Seeker — interprets clues and taps tiles, trying to find Dusk's tiles without hitting anything dangerous.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tile types -->
+    <div class="section">
+      <div class="section-title">The Tiles</div>
+      <p>The board has 19 tiles. Each belongs to one of five types — only the Pathfinders know which is which before the game begins.</p>
+      <div class="tile-list">
+        <div class="tile-row">
+          <div class="tile-swatch swatch-dawn">D</div>
+          <div>
+            <div class="tile-info-name">Dawn Tiles</div>
+            <div class="tile-info-desc">Belong to the Dawn Guild. Revealing one scores a point for Dawn. Dawn Seekers want to find all of these.</div>
+          </div>
+        </div>
+        <div class="tile-row">
+          <div class="tile-swatch swatch-dusk">D</div>
+          <div>
+            <div class="tile-info-name">Dusk Tiles</div>
+            <div class="tile-info-desc">Belong to the Dusk Guild. Revealing one scores a point for Dusk. Dusk Seekers want to find all of these.</div>
+          </div>
+        </div>
+        <div class="tile-row">
+          <div class="tile-swatch swatch-neutral">—</div>
+          <div>
+            <div class="tile-info-name">Neutral Tiles</div>
+            <div class="tile-info-desc">Belong to neither team. Revealing one simply ends your turn — no points scored, no penalty.</div>
+          </div>
+        </div>
+        <div class="tile-row">
+          <div class="tile-swatch swatch-treasure">💰</div>
+          <div>
+            <div class="tile-info-name">Treasure Tile</div>
+            <div class="tile-info-desc">There is one Treasure tile on the board. Whichever team reveals it wins the round immediately, regardless of how many tiles remain. A golden prize worth hunting for.</div>
+          </div>
+        </div>
+        <div class="tile-row">
+          <div class="tile-swatch swatch-abyss">🌀</div>
+          <div>
+            <div class="tile-info-name">Abyss Tile</div>
+            <div class="tile-info-desc">There is one Abyss tile. Touching it immediately ends your turn — and scores a point for the opposing team. Tread carefully.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- How a turn works -->
+    <div class="section">
+      <div class="section-title">How a Turn Works</div>
+      <div class="steps">
+        <div class="step">
+          <div class="step-num">1</div>
+          <div class="step-body">
+            <div class="step-title">Pathfinder Charts the Course</div>
+            <div class="step-desc">The active team's Pathfinder enters exactly one word and a number. The word is the clue — it should link to one or more of their team's tiles on the board. The number tells Seekers how many tiles the clue connects to. A count of 0 means "unlimited guesses, use your judgment."</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">2</div>
+          <div class="step-body">
+            <div class="step-title">Seekers Hunt</div>
+            <div class="step-desc">The Seekers discuss and tap tiles on the board. You may guess up to the clue number plus one bonus guess. Each correct guess (your own team's tile) reveals the tile and you can keep going. A wrong guess — neutral, opponent's tile, or worse — ends the guessing phase immediately (unless a Shield is active).</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">3</div>
+          <div class="step-body">
+            <div class="step-title">Take a Nap (End Turn Voluntarily)</div>
+            <div class="step-desc">At any point during guessing, the active Seekers can choose to "Take a Nap" and voluntarily pass the turn to the other team — useful when you've found the tiles you wanted or are uncertain about the rest.</div>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-num">4</div>
+          <div class="step-body">
+            <div class="step-title">Turns Alternate</div>
+            <div class="step-desc">After a turn ends — whether by choice, wrong guess, or the turn limit — the other team's Pathfinder takes over. This continues until one team wins.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Winning -->
+    <div class="section">
+      <div class="section-title">Winning the Game</div>
+      <p>A team wins by revealing all of their assigned tiles first. But there are two shortcuts:</p>
+      <p><strong>Treasure:</strong> The team that reveals the Treasure tile wins instantly — no matter how many tiles are left on either side.</p>
+      <p><strong>Abyss:</strong> Revealing the Abyss tile ends your turn and hands a point to the enemy. It does not end the game — but it can swing momentum decisively.</p>
+      <p>The header always shows the current score and whose turn it is, so everyone stays in the loop at a glance.</p>
+    </div>
+
+    <!-- Power-ups -->
+    <div class="section">
+      <div class="section-title">Power-ups (Relics)</div>
+      <p>When Power-ups are enabled in Game Settings, Seekers have access to two relics per game. Each relic can be used once per match.</p>
+      <div class="powerup-grid">
+        <div class="powerup-card">
+          <div class="powerup-icon">👁</div>
+          <div class="powerup-name">Peek</div>
+          <div class="powerup-desc">Privately reveals the nature of one tile before you commit to guessing it. Only you can see the result — it disappears after a few seconds. Useful when you're torn between two tiles.</div>
+        </div>
+        <div class="powerup-card">
+          <div class="powerup-icon">🛡</div>
+          <div class="powerup-name">Shield</div>
+          <div class="powerup-desc">Activates a protective layer. Your next wrong guess will not end the turn — the tile is revealed, but guessing continues as normal. Spend it wisely on a risky pick.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Game Settings -->
+    <div class="section">
+      <div class="section-title">Game Settings</div>
+      <p>The Pathfinder (or any player in the lobby) can adjust settings before the game begins via the ⚙ gear icon.</p>
+      <div class="settings-list">
+        <div class="setting-item">
+          <div class="setting-name">Rapid Mode</div>
+          <div class="setting-desc">Adds a countdown timer to each guessing phase (15–300 seconds, configurable). When time runs out, the turn ends automatically. Can only be toggled in the lobby.</div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-name">Word Definitions</div>
+          <div class="setting-desc">Pathfinders can hover over any unrevealed tile to see its dictionary definition. Helpful for thinking through connections without having to recall every meaning from memory. Can only be toggled in the lobby.</div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-name">Power-ups</div>
+          <div class="setting-desc">Enables or disables the Peek and Shield relics for Seekers. Can be changed at any time.</div>
+        </div>
+        <div class="setting-item">
+          <div class="setting-name">Color Blind Mode</div>
+          <div class="setting-desc">Replaces Dawn red with orange and Abyss dark purple with indigo for clearer distinction. Can be toggled at any time and only affects your own view.</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tips -->
+    <div class="section">
+      <div class="section-title">Tips & Strategy</div>
+      <div class="tips-list">
+        <div class="tip"><span class="tip-bullet">◆</span><span>As a Pathfinder, think about which of your tiles share something in common — a category, a shape, a feeling — that doesn't accidentally point to the Abyss or the opponent's tiles.</span></div>
+        <div class="tip"><span class="tip-bullet">◆</span><span>A clue count of 0 is legal — it signals "unlimited guesses" and works best when you have confidence in your Seekers and want to let them catch up on old clues.</span></div>
+        <div class="tip"><span class="tip-bullet">◆</span><span>As a Seeker, always guess your most confident tile first. If it turns out to be wrong, the Shield relic can save the turn. Save the Shield for when the stakes are highest.</span></div>
+        <div class="tip"><span class="tip-bullet">◆</span><span>Use Peek on tiles you strongly suspect are yours but aren't 100% sure about. It confirms or denies before you commit — spending one use of Peek is almost always better than handing a point to the enemy.</span></div>
+        <div class="tip"><span class="tip-bullet">◆</span><span>Don't be afraid to Take a Nap early. Stopping after two correct guesses is often smarter than risking a third uncertain one.</span></div>
+        <div class="tip"><span class="tip-bullet">◆</span><span>The Treasure tile is a game-ender. If your Pathfinder gives a clue you think might link to the Treasure, chase it aggressively — first team there wins outright.</span></div>
+        <div class="tip"><span class="tip-bullet">◆</span><span>Share the room code or invite link with friends so they can join directly. The more hunters, the more lively the debate.</span></div>
+      </div>
+    </div>
+
+  </div>
+
+  <script>
+    (function () {
+      const btn = document.getElementById('theme-toggle');
+      if (!btn) return;
+      const sunSvg  = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="5"/><path d="M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42"/></svg>`;
+      const moonSvg = `<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/></svg>`;
+      function applyIcon() {
+        btn.innerHTML = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark' ? sunSvg : moonSvg;
+      }
+      btn.addEventListener('click', () => {
+        const next = (document.documentElement.getAttribute('data-theme') || 'dark') === 'dark' ? 'light' : 'dark';
+        document.documentElement.setAttribute('data-theme', next);
+        localStorage.setItem('wordhunt-theme', next);
+        applyIcon();
+      });
+      applyIcon();
+    })();
+  </script>
+</body>
+</html>
