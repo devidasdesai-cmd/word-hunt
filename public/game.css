@@ -1802,78 +1802,130 @@ body.peek-mode .card.peekable:hover {
    RESPONSIVE — Mobile
 ═══════════════════════════════════════════════════ */
 @media (max-width: 640px) {
-  html, body {
-    height: auto;
-    overflow: visible;
-    overflow-x: hidden;
+  /* Responsive tile size: fills available width exactly, no transform hack */
+  :root {
+    --m-tile: clamp(54px, calc((100vw - 44px) / 5), 72px);
+    --m-gap:  5px;
   }
+
+  html, body { height: auto; overflow: visible; overflow-x: hidden; }
   body { min-height: 100svh; }
 
-  .header { padding: 0.55rem 0.875rem; gap: 0.4rem; flex-wrap: wrap; }
-  .header-left { flex: 1; gap: 0.45rem; min-width: 0; }
-  .logo-sm { font-size: 1.05rem; }
-  .room-code-badge { font-size: 0.65rem; padding: 0.22rem 0.5rem; }
-  .score-bar { position: static; transform: none; order: 10; width: 100%; justify-content: center; gap: 0.9rem; padding-top: 0.22rem; border-top: 1px solid var(--border); pointer-events: auto; }
-  .score-num { font-size: 1.3rem; }
-  .turn-indicator { font-size: 0.67rem; padding: 0.26rem 0.62rem; }
-  .header-right { flex-shrink: 0; gap: 0.3rem; }
-  .my-role-bar { font-size: 0.65rem; padding: 0.22rem 0.5rem; }
+  /* ── Header ── */
+  .header { padding: 0.5rem 0.875rem; gap: 0.35rem; flex-wrap: wrap; }
+  .header-left { flex: 1; gap: 0.4rem; min-width: 0; }
+  .logo-sm { font-size: 1rem; }
+  .room-code-badge { font-size: 0.62rem; padding: 0.2rem 0.45rem; }
+  .score-bar { position: static; transform: none; order: 10; width: 100%; justify-content: center; gap: 0.75rem; padding-top: 0.25rem; border-top: 1px solid var(--border); pointer-events: auto; }
+  .score-num { font-size: 1.2rem; }
+  .score-label { font-size: 0.65rem; }
+  .turn-indicator { font-size: 0.65rem; padding: 0.24rem 0.55rem; }
+  .header-right { flex-shrink: 0; }
+  .my-role-bar { font-size: 0.62rem; padding: 0.2rem 0.45rem; max-width: 130px; }
   .spy-btn { font-size: 0.62rem; padding: 0.22rem 0.5rem; gap: 0.22rem; }
   .spy-btn svg { width: 11px; height: 11px; }
-
+  /* Bigger touch targets for icon buttons */
+  .theme-toggle,
+  .settings-header-gear { width: 36px; height: 36px; }
   .role-change-dropdown { min-width: 200px; }
 
+  /* ── Main layout ── */
   .main { flex-direction: column; overflow: visible; height: auto; flex: none; }
   .panel { display: none; }
-  .center { overflow: visible; flex: none; padding: 0.55rem 0.7rem; gap: 0.45rem; }
+  .center { overflow: visible; flex: none; padding: 0.5rem 0.75rem; gap: 0.4rem; }
 
-  .mobile-players { display: flex; padding: 0.28rem 0; border-bottom: 1px solid var(--border); padding-bottom: 0.45rem; }
+  /* ── Mobile players strip ── */
+  .mobile-players { display: flex; flex-wrap: wrap; gap: 0.3rem; padding-bottom: 0.4rem; border-bottom: 1px solid var(--border); }
 
-  .action-bar { min-height: 44px; flex-wrap: wrap; gap: 0.45rem; }
-  .lobby-actions { gap: 0.38rem; }
+  /* ── Action bar & lobby ── */
+  .action-bar { min-height: 40px; flex-wrap: wrap; gap: 0.4rem; justify-content: center; padding: 0.15rem 0; }
+  .lobby-actions { gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
+  .team-pick-btn { padding: 0.6rem 1rem; font-size: 0.82rem; min-width: 76px; touch-action: manipulation; }
+  .start-btn { padding: 0.6rem 1.5rem; font-size: 0.88rem; touch-action: manipulation; }
 
-  .team-pick-btn { padding: 0.5rem 0.8rem; font-size: 0.8rem; min-width: 70px; }
-  .start-btn { padding: 0.55rem 1.4rem; font-size: 0.85rem; }
+  /* ── Clue form (Pathfinder) ── */
+  .clue-form { gap: 0.35rem; flex-wrap: wrap; justify-content: center; }
+  .clue-word-input { width: 145px; font-size: 0.92rem; padding: 0.52rem 0.7rem; }
+  .clue-count-input { width: 54px; font-size: 0.92rem; padding: 0.52rem 0.4rem; }
+  .give-clue-btn { padding: 0.52rem 1rem; font-size: 0.82rem; }
 
-  .clue-form { gap: 0.38rem; }
-  .clue-word-input { width: 138px; font-size: 0.88rem; padding: 0.48rem 0.7rem; }
-  .clue-count-input { width: 52px; font-size: 0.88rem; padding: 0.48rem 0.38rem; }
-  .give-clue-btn { padding: 0.48rem 0.9rem; font-size: 0.8rem; }
+  /* ── Guessing bar ── */
+  .clue-word-display { font-size: 1.15rem; }
+  .clue-count-display { font-size: 0.85rem; }
+  .end-turn-btn { padding: 0.42rem 0.85rem; font-size: 0.7rem; }
+  .guessing-controls { gap: 0.4rem; flex-wrap: wrap; justify-content: center; }
+  .relic-active-hint { font-size: 0.68rem; }
 
-  .status-bar { gap: 0.45rem; }
-  .clue-word-display { font-size: 1.2rem; }
-  .clue-count-display { font-size: 0.88rem; }
-  .end-turn-btn { margin-left: 0; padding: 0.42rem 0.85rem; font-size: 0.72rem; }
+  /* ── Board — proper responsive sizing, no transform ── */
+  .board {
+    flex: none;
+    height: auto;
+    width: calc(5 * var(--m-tile) + 4 * var(--m-gap));
+    gap: var(--m-gap);
+    margin: 0.2rem auto;
+    transform: none;
+  }
+  .hex-row { gap: var(--m-gap); }
+  .hex-row-4 { margin-left: calc((var(--m-tile) + var(--m-gap)) / 2); }
+  .hex-row-3 { margin-left: calc(var(--m-tile) + var(--m-gap)); }
 
-  .board { flex: none; height: auto; transform-origin: top center; transform: scale(0.65); margin-top: -72px; margin-bottom: -72px; pointer-events: auto; }
+  .card {
+    width: var(--m-tile);
+    height: var(--m-tile);
+    padding: 0.1rem 0.3rem;
+  }
+  .card-word {
+    font-size: clamp(0.42rem, calc(var(--m-tile) * 0.096), 0.6rem);
+    letter-spacing: 0.03em;
+  }
+  .card-tile-emoji { font-size: 0.72rem; bottom: 6px; }
 
-  .log-panel { height: 56px; }
-  .log-entry { font-size: 0.66rem; }
+  /* ── Log ── */
+  .log-panel { height: 62px; }
+  .log-entry { font-size: 0.65rem; }
 
-  .overlay-card { padding: 2rem 1.25rem; border-radius: 16px; }
-  .overlay-card h2 { font-size: 1.65rem; }
-  .winner-icon { font-size: 2.4rem; }
+  /* ── Overlays ── */
+  .overlay { align-items: flex-start; padding-top: 5svh; }
+  .overlay-card { padding: 1.75rem 1.25rem; border-radius: 14px; max-height: 90svh; overflow-y: auto; width: calc(100vw - 2rem); }
+  .overlay-card h2 { font-size: 1.5rem; }
+  .winner-icon { font-size: 2.2rem; }
 
-  .relic-card { padding: 0.32rem 0.6rem 0.32rem 0.44rem; }
-  .relic-icon { width: 17px; height: 17px; }
-  .relic-name { font-size: 0.65rem; }
-  .relic-status { font-size: 0.58rem; }
+  /* ── Role selection overlay ── */
+  .role-overlay-card { max-width: 100%; }
+  .role-overlay-card h2 { font-size: 1.4rem; margin-bottom: 0.35rem; }
+  .role-overlay-card .role-subtitle { font-size: 0.78rem; margin-bottom: 1.25rem; }
+  .role-grid { gap: 0.55rem; }
+  .role-btn { padding: 0.85rem 0.65rem; gap: 0.22rem; }
+  .role-btn-name { font-size: 0.92rem; }
+  .role-btn-desc { font-size: 0.62rem; }
+
+  /* ── Settings ── */
   .settings-toggle-btn { font-size: 0.72rem; padding: 0.45rem 0.72rem; }
-  .rapid-timer { font-size: 1.25rem; }
+  .rapid-timer { font-size: 1.2rem; }
   .toggle-option { font-size: 0.7rem; padding: 0.42rem 0.65rem; }
   .toggle-option-label { font-size: 0.7rem; }
   .duration-input { width: 46px; font-size: 0.78rem; }
+
+  /* ── Relics ── */
+  .relic-card { padding: 0.3rem 0.55rem 0.3rem 0.42rem; }
+  .relic-icon { width: 16px; height: 16px; }
+  .relic-name { font-size: 0.63rem; }
 }
 
+/* Extra small phones */
 @media (max-width: 380px) {
+  :root {
+    --m-tile: calc((100vw - 38px) / 5);
+    --m-gap: 4px;
+  }
   .logo-sm { display: none; }
-  .team-pick-btn { min-width: 62px; font-size: 0.75rem; }
+  .team-pick-btn { min-width: 64px; font-size: 0.76rem; }
+  .card-word { letter-spacing: 0.01em; }
 }
 
 @media (max-width: 480px) {
-  .role-overlay-card h2 { font-size: 1.45rem; }
-  .role-btn { padding: 0.9rem 0.75rem; }
-  .role-btn-name { font-size: 0.92rem; }
+  .role-overlay-card h2 { font-size: 1.35rem; }
+  .role-btn { padding: 0.8rem 0.6rem; }
 }
 
 /* ═══════════════════════════════════════════════════
