@@ -58,10 +58,30 @@ function refreshSettingsOverlayBody() {
 
 // ─── Copy invite link ────────────────────────────────
 document.getElementById('copy-link-btn').addEventListener('click', () => {
-  navigator.clipboard.writeText(`${window.location.origin}/?join=${roomCode}`).catch(() => {});
-  const btn = document.getElementById('copy-link-btn');
-  btn.style.color = '#27ae60';
-  setTimeout(() => btn.style.color = '', 1500);
+  const text = `${window.location.origin}/?join=${roomCode}`;
+  const btn  = document.getElementById('copy-link-btn');
+
+  function onSuccess() {
+    btn.style.color = '#27ae60';
+    setTimeout(() => btn.style.color = '', 1500);
+  }
+
+  function fallback() {
+    const ta = document.createElement('textarea');
+    ta.value = text;
+    ta.style.cssText = 'position:fixed;top:0;left:0;opacity:0;font-size:16px;';
+    document.body.appendChild(ta);
+    ta.focus();
+    ta.select();
+    try { document.execCommand('copy'); onSuccess(); } catch (_) {}
+    document.body.removeChild(ta);
+  }
+
+  if (navigator.clipboard && navigator.clipboard.writeText) {
+    navigator.clipboard.writeText(text).then(onSuccess).catch(fallback);
+  } else {
+    fallback();
+  }
 });
 
 // ─── Socket events ───────────────────────────────────
