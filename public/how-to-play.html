@@ -609,7 +609,7 @@
           </div>
           <div>
             <div class="tile-info-name">Neutral Tiles</div>
-            <div class="tile-info-desc">Belong to neither team. Revealing one awards the opposing team 0.5 points and ends your turn immediately. Treat them like landmines — only guess when you're confident.</div>
+            <div class="tile-info-desc">Belong to neither team. Revealing one costs your team 0.5 points, awards the opposing team 0.5 points, and ends your turn immediately. Treat them like landmines — only guess when you're confident.</div>
           </div>
         </div>
         <div class="tile-row">
@@ -652,7 +652,7 @@
           <div class="step-num">2</div>
           <div class="step-body">
             <div class="step-title">Seekers Hunt</div>
-            <div class="step-desc">The Seekers discuss and tap tiles on the board. Each correct guess (your own team's tile) scores a point and lets you keep going. A wrong guess — a Neutral or the opponent's tile — awards the opposing team 0.5 pts and ends your turn immediately. The Shield relic fully absorbs one wrong guess: the tile is not revealed, no bonus is awarded to the opponent, and guessing continues. Using power-ups (Peek or Shield) does not reset your streak — 3 correct guesses in a turn earn a bonus point regardless of power-up use.</div>
+            <div class="step-desc">The Seekers discuss and tap tiles on the board. Each correct guess (your own team's tile) scores a point and lets you keep going. A wrong guess — a Neutral or the opponent's tile — deducts 0.5 pts from your team and awards 0.5 pts to the opposing team, then ends your turn immediately. The Shield relic fully absorbs one wrong guess: the tile is not revealed, no points change hands, and guessing continues. Using power-ups (Peek or Shield) does not reset your streak — 3 correct guesses in a turn earn a bonus point regardless of power-up use.</div>
           </div>
         </div>
         <div class="step">
@@ -699,16 +699,20 @@
           <div class="score-value">+1</div>
           <div class="score-label">Reveal the Treasure tile — your turn continues after claiming it</div>
         </div>
+        <div class="score-row negative">
+          <div class="score-value">−½</div>
+          <div class="score-label">Deducted from your team for revealing a Neutral tile or the opponent's tile — turn ends immediately</div>
+        </div>
         <div class="score-row positive">
           <div class="score-value">+½</div>
-          <div class="score-label">Awarded to the <em>opposing</em> team when you reveal a Neutral tile or their tile — your turn ends immediately</div>
+          <div class="score-label">Awarded to the opposing team whenever your team makes a wrong guess — a 1-point swing in total</div>
         </div>
         <div class="score-row neutral-row">
           <div class="score-value">—</div>
           <div class="score-label">Reveal the Abyss tile — game ends instantly, the opposing team wins regardless of score</div>
         </div>
       </div>
-      <p style="margin-top:0.9rem;">Wrong guesses reward the other team — they don't deduct from yours. The Shield relic fully blocks a bad guess — no reveal, no bonus to the opponent, and guessing continues.</p>
+      <p style="margin-top:0.9rem;">A single wrong guess creates a 1-point swing: −0.5 from your team and +0.5 to the opponent. The Shield relic fully blocks a bad guess — no reveal, no points change hands, and guessing continues.</p>
     </div>
 
     <!-- Power-ups -->
@@ -759,9 +763,9 @@
       <div class="tips-list">
         <div class="tip"><span class="tip-bullet">◆</span><span>As a Pathfinder, think about which of your tiles share something in common — a category, a shape, a feeling — that doesn't accidentally point to the Abyss or the opponent's tiles.</span></div>
         <div class="tip"><span class="tip-bullet">◆</span><span>A clue count of 0 is legal — it signals "unlimited guesses" and works best when you have confidence in your Seekers and want to let them catch up on old clues.</span></div>
-        <div class="tip"><span class="tip-bullet">◆</span><span>Wrong guesses award the other team 0.5 pts — a guess that feels only 60% certain can easily hand the opponent a gift. "Take a Nap" is always a valid move.</span></div>
-        <div class="tip"><span class="tip-bullet">◆</span><span>Save the Shield for your riskiest guess, not your first one. It fully blocks a bad guess — no reveal, no +0.5 to the opponent, guessing continues — so timing it well can flip a 1.5-point swing in your favor.</span></div>
-        <div class="tip"><span class="tip-bullet">◆</span><span>Use Peek on a tile you're 70% sure about, not 95% sure. At 95% confidence just guess it. At 70% the Peek is worth spending to stop the opponent gaining +0.5 and to keep your streak alive.</span></div>
+        <div class="tip"><span class="tip-bullet">◆</span><span>A single wrong guess creates a 1-point swing — −0.5 from your score and +0.5 to the opponent. A guess that's only 60% certain can easily hurt more than it helps. "Take a Nap" is always a valid move.</span></div>
+        <div class="tip"><span class="tip-bullet">◆</span><span>Save the Shield for your riskiest guess, not your first one. It fully blocks a bad guess — no reveal, no points change hands — so using it at the right moment can neutralize a full 1-point swing.</span></div>
+        <div class="tip"><span class="tip-bullet">◆</span><span>Use Peek on a tile you're 70% sure about, not 95% sure. At 95% confidence just guess it. At 70%, the Peek is worth spending to avoid the 1-point swing and keep your streak alive.</span></div>
         <div class="tip"><span class="tip-bullet">◆</span><span>When your team is about to reveal their last tile, think about what clue the opposing team might give during their final turn. If they're likely to score big, consider whether to trigger the final turn now or keep guessing for more points first.</span></div>
         <div class="tip"><span class="tip-bullet">◆</span><span>The Treasure tile gives +1 and keeps your turn going — it's worth chasing, especially when scores are close. The Abyss ends the game instantly with no final turn, so near the endgame treat any uncertain tile as a potential Abyss.</span></div>
         <div class="tip"><span class="tip-bullet">◆</span><span>As a Pathfinder, think about which of your tiles share something in common that doesn't accidentally point toward Neutral tiles, the opponent's tiles, or the Abyss. A clue that gets 2 safe tiles is better than one that risks a −0.5 trying for 3.</span></div>

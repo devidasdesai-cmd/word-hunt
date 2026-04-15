@@ -395,11 +395,12 @@ io.on('connection', (socket) => {
       return; // turn keeps going — do NOT fall through to switchTurn
     }
 
-    // ── Neutral / opponent card: +0.5 pts to opposing team, end turn ──
+    // ── Neutral / opponent card: −0.5 to guessing team, +0.5 to opponent ──
     if (!isOwnCard) {
       const opponentTeam = game.currentTeam === 'red' ? 'blue' : 'red';
+      game.scores[game.currentTeam] -= 0.5;
       game.scores[opponentTeam] += 0.5;
-      addLog(game, `+0.5 pts for ${opponentTeam === 'red' ? 'Dawn' : 'Dusk'} Guild`);
+      addLog(game, `−0.5 for ${game.currentTeam === 'red' ? 'Dawn' : 'Dusk'} Guild, +0.5 for ${opponentTeam === 'red' ? 'Dawn' : 'Dusk'} Guild`);
       if (game.finalTurnActive) {
         endGame(game);
       } else {
