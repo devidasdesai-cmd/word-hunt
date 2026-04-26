@@ -2045,10 +2045,23 @@ body.peek-mode .card.peekable:hover {
   text-shadow: 0 0 8px rgba(90,40,170,0.35), 0 1px 3px rgba(0,0,0,0.9);
 }
 
-[data-theme="light"] .card.revealed-neutral {
-  background: radial-gradient(circle at 50% 50%, #c8cad8, #b8bace);
-  opacity: 0.45;
+/* Lighten red/blue so they don't look like black holes against a light page */
+[data-theme="light"] .card.revealed-red {
+  background: radial-gradient(circle at 38% 32%, #d94535, #a81c2a 55%, #701020 100%);
 }
+[data-theme="light"] .card.revealed-blue {
+  background: radial-gradient(circle at 38% 32%, #2e88cc, #144878 55%, #0a2648 100%);
+}
+
+/* Neutral: light grey bg needs dark text — white-on-light-grey is invisible */
+[data-theme="light"] .card.revealed-neutral {
+  background: radial-gradient(circle at 50% 50%, #c8cad8, #b0b4c8);
+  opacity: 0.55;
+}
+[data-theme="light"] .card.revealed-neutral .card-word {
+  color: rgba(50, 50, 70, 0.5);
+}
+
 [data-theme="light"] .card.revealed-abyss { opacity: 0.8; }
 
 [data-theme="light"] .overlay { background: rgba(10,12,28,0.65); }
